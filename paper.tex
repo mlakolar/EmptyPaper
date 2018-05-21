@@ -1,0 +1,84 @@
+\documentclass[11pt]{article}
+ 
+ \pdfminorversion=4
+
+\usepackage{mkolar_definitions}
+\usepackage{color}
+\usepackage{fullpage}
+\usepackage{wrapfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{natbib}
+\usepackage{mathabx}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{multirow}
+
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            urlcolor=blue,
+            citecolor=blue]{hyperref}
+
+\numberwithin{equation}{section}
+\numberwithin{theorem}{section}
+%\numberwithin{lemma}{section}
+
+%\addtolength{\textwidth}{1in} \addtolength{\oddsidemargin}{-0.5in}
+%\addtolength{\textheight}{1in} \addtolength{\topmargin}{-0.62in}
+\renewcommand{\baselinestretch}{1.05}
+
+\usepackage{xargs}    
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+
+\newcommand{\mk}[1]{\textcolor{green}{Mladen: #1}}
+\newcommand{\UPDATE}{\fbox{Update}\\}
+
+\begin{document}
+
+
+\title{}
+\author{} 
+\date{First draft: ...}
+
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+
+\noindent {\bf Keywords:} 
+
+\newpage
+
+
+\section*{Acknowledgments}
+
+This work is partially supported by an IBM Corporation Faculty
+Research Fund at the University of Chicago Booth School of Business.
+This work was completed in part with resources provided by the
+University of Chicago Research Computing Center.
+
+%\newpage
+
+
+{
+\bibliographystyle{my-plainnat}
+\bibpunct{(}{)}{,}{a}{,}{,}
+\bibliography{paper}
+}
+
+%\newpage
+
+\appendix
+
+\end{document}
