@@ -1,21 +1,21 @@
 \documentclass[11pt]{article}
- 
- \pdfminorversion=4
+
+\pdfminorversion=4
 
 \usepackage{mkolar_definitions}
+
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{array}
 \usepackage{color}
 \usepackage{fullpage}
-\usepackage{wrapfig}
-\usepackage{algorithm}
-\usepackage{algorithmic}
-\usepackage{multirow}
-\usepackage{tabularx}
-\usepackage{array}
-\usepackage{natbib}
-\usepackage{mathabx}
 \usepackage{graphicx}
-\usepackage{rotating}
+\usepackage{mathabx}
 \usepackage{multirow}
+\usepackage{natbib}
+\usepackage{rotating}
+\usepackage{tabularx}
+\usepackage{wrapfig}
 
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage[colorlinks=true,
@@ -41,25 +41,112 @@
 \newcommand{\mk}[1]{\textcolor{green}{Mladen: #1}}
 \newcommand{\UPDATE}{\fbox{Update}\\}
 
-\begin{document}
+%%%%% Additional Packages
 
+\usepackage{algorithm2e}
+\makeatletter
+\renewcommand{\@algocf@capt@plain}{above}
+\RestyleAlgo{boxruled}
+\makeatother
+
+\usepackage{apptools}
+\usepackage{chngcntr}
+\AtAppendix{\counterwithin{lem}{section}}
+
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage{titlesec}
+\titleformat*{\section}{\normalfont\bfseries}
+\titleformat*{\subsection}{\normalfont\bfseries}
+
+
+%%%%% Additional Definitions
+
+%\DeclareMathOperator*{\argmax}{arg max}
+%\DeclareMathOperator*{\argmin}{arg min}
+%\DeclareMathOperator*{\diag}{diag}
+\DeclareMathOperator*{\diam}{diam}
+%\DeclareMathOperator*{\sgn}{sgn}
+\DeclareMathOperator*{\supp}{supp}
+
+%\DeclareMathOperator{\Cov}{Cov}
+%\DeclareMathOperator{\Var}{Var}
+
+\DeclareMathOperator{\Unif}{Unif}
+
+\def\Db{\mathbf{D}}
+\def\Hb{\mathbf{H}}
+\def\Ib{\mathbf{I}}
+\def\Sbb{\mathbf{S}}
+\def\Tb{\mathbf{T}}
+\def\Xb{\mathbf{X}}
+\def\Yb{\mathbf{Y}}
+
+\def\fate{\boldsymbol{e}}
+\def\fath{\boldsymbol{h}}
+\def\fatr{\boldsymbol{r}}
+\def\fatu{\boldsymbol{u}}
+\def\fatv{\boldsymbol{v}}
+\def\fatw{\boldsymbol{w}}
+\def\fatx{\boldsymbol{x}}
+\def\faty{\boldsymbol{y}}
+\def\fatz{\boldsymbol{z}}
+
+\def\fatbeta{\boldsymbol{\beta}}
+\def\fatgamma{\boldsymbol{\gamma}}
+\def\fatdelta{\boldsymbol{\delta}}
+\def\fatepsilon{\boldsymbol{\epsilon}}
+\def\fateta{\boldsymbol{\eta}}
+\def\fatmu{\boldsymbol{\mu}}
+\def\fattheta{\boldsymbol{\theta}}
+\def\fatpsi{\boldsymbol{\psi}}
+\def\fatomega{\boldsymbol{\omega}}
+
+\def\fatDelta{\boldsymbol{\Delta}}
+\def\fatLambda{\boldsymbol{\Lambda}}
+\def\fatPsi{\boldsymbol{\Psi}}
+\def\fatSigma{\boldsymbol{\Sigma}}
+\def\fatTheta{\boldsymbol{\Theta}}
+\def\fatOmega{\boldsymbol{\Omega}}
+
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
+
+\newtheorem{thm}{Theorem}
+\newtheorem{cor}[thm]{Corollary}
+
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{prop}[lem]{Proposition}
+
+\theoremstyle{definition}
+%\newtheorem{assumption}{Assumption}[section]
+%\newtheorem{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}
+
+\renewcommand{\theassumption}{\arabic{section}.\arabic{assumption}}
+\renewcommand{\thethm}{\arabic{section}.\arabic{thm}}
+\renewcommand{\thecor}{\arabic{section}.\arabic{cor}}
+\renewcommand{\thelem}{\arabic{section}.\arabic{lem}}
+\renewcommand{\theprop}{\arabic{section}.\arabic{prop}}
+
+%%%%%
 
 \title{}
 \author{} 
 \date{First draft: ...}
 
+\begin{document}
 
 \maketitle
 
 \begin{abstract}
-
 \end{abstract}
-
 
 \noindent {\bf Keywords:} 
 
 \newpage
-
 
 \section*{Acknowledgments}
 
@@ -68,8 +155,789 @@ Research Fund at the University of Chicago Booth School of Business.
 This work was completed in part with resources provided by the
 University of Chicago Research Computing Center.
 
-%\newpage
+\newpage
 
+\section{Introduction}
+
+Interactions of random variables can be described via \textit{graphical models} whose graphical representation gives us insights into the \emph{structured information} lies in our dataset \cite{Koller2009Probabilistic,Mackay2003}. For example, the interactions among genes can be represented via a graphical model where the presence of edges indicates regulatory activities in gene expressions \cite{Hartemink2000,Dobra2004}.
+
+Undirected graphical models are connected with exponential family distributions via \emph{conditional independence} \cite{Hammersley1971}. If random variable $X_i$ and  $X_j$ are conditionally independent given the rest of random variables, the corresponding parameter $\theta_{i,j}$ in a \emph{pairwise} exponential family model will be zero. If most of the random variable pairs are conditionally independent, our parametrization of the density function will become sparse.
+
+%This observation give rise to the concept of \emph{sparse} graphical model.
+
+Built on a simplicity assumption, a sparse graphical model assumes that there exists only a small number of edges in the graphical structure so the structural sparsity can be in turn translated into the model sparsity. Sparse graphical model, thanks to its interpretability, has become a powerful tool for \emph{high dimensional} data analysis and has been extensively investigated by both practitioners and theoreticians \cite{Friedman2008Sparse,ravikumar09high}.
+
+However, in many applications, interactions among random variables constantly change. For example, genes may regulate each other differently when the external environment is altered. EEG signals from different parts of the brain may be correlated/uncorrelated when the patient performs different activities.
+Discovering such changes in graphical models may provide us key insights into the underlying system. A single graphical model, lacking the ability of describing such changes, cannot reflect the dynamic nature of these data.
+
+To obtain \emph{sparse changes} between two graphical models, one can naively learn two sparse graphical models and figure out changes by comparing two separately learned models. However, two issues remain. First, it is unclear how to tune the sparsity level on two individual models in order to obtain the \emph{optimal }differential results. Second, the sparsity assumption imposed on individual graphical models can be too restrictive as sparse changes can be produced by two dense graphical models.
+
+Naturally, one can directly assume the sparsity of the changes themselves without assuming the sparsity level on individual models. This rationale leads to direct sparse changes modelling and learning. Similar to the correspondence between the graphical structure and the graphical model parametrization, the structural change can also be related to the \emph{differential parametrization} between graphical models. In recent years, learning differential parameters of graphical models has become popular in the statistics community. For example, \cite{Zhao2014Direct} proposed to solve a CLIME \cite{Cai2011Constrained}-like optimization problem, while \cite{Liu2016a} and \cite{Fazayeli2016Generalized} estimates the differential parameter via a \emph{density ratio estimation}. 
+
+\subsection{Density Ratio Estimation on Learning Graphical Model Changes}
+\emph{Density ratio estimation} has been recently introduced to the machine learning community and has been proven useful in a wide range of applications \cite{Sugiyama2012}. It models and learns the ratio between two probability density functions $p$ and $q$ directly rather than work out $p$ and $q$ separately and then take the ratio. The rationale behind this technique is the ``Vapnik's Principle'' : When solving a problem of interest,	one should not solve a more general problem as an intermediate step \cite{Vapnik1998}. The estimated ratio can become a natural ``importance weight'' in transfer learning tasks, such as covariate-shift \cite{Shimodaira2000,Sugiyama2007covariate}. The learned density ratio itself can also quantify the differences between two distributions, thus can be used for change-point detection \cite{Liu2013} and statistical two-sample test \cite{Sugiyama2011}.
+
+Comparing to naive methods that estimate the individual density functions, the density ratio estimation does not directly impose parametric assumptions on the density functions. Instead, it makes assumptions on the ratio, which can be less restraint in some settings. Even for general non-Gaussian graphical models, the estimator has a tractable form that can be constructed from empirical samples in \emph{both} distributions.
+
+Density ratio can be used to characterize the changes between two graphical models. As undirected graphical models can be parametrized as exponential family distributions, the ratio between two exponential family distributions also has an exponential form with the sufficient statistics that is the same as the individual densities and the natural parameter being the \emph{difference} between two natural parameters of individual distributions. Therefore, learning the ratio between two densities can help us identify the changes between two graphical models.
+
+\cite{Liu2014,Liu2016a} studied a specific density ratio estimator called Kullback-leibler Importance Estimation Procedure (KLIEP) \cite{Sugiyama2008} on learning sparse structural changes between graphical models. The $\ell_2$ consistency of KLIEP on Ising models has been proven by generic-chaining technique recently \cite{Fazayeli2016Generalized}. 
+
+\subsection{Related Works on Learning Changes between Graphical Models}
+Instead of using Density Ratio Estimation, some recent developments on this problem followed a different direction. \cite{Zhao2014Direct} solved a CLIME-like optimization problem making use of a special covariance-precision matrix equality of Gaussian distributions. The optimization is solved directly with respect to the differential parameter itself so  it also does not require extra sparsity assumptions on two individual graphical models. The support consistency of the estimator can be proved. A further investigation shows, the estimator is also consistent on\emph{ transelliptical distributions} \cite{Xu2016Semiparametric}.
+In fact, changing graphical models have been studied under  slightly different problem settings. \cite{kolar10estimating} considered a time-varying graphical model that changes \emph{smoothly} over time as well as graphical models with ``jumps''\cite{kolar10estimating}. However, the focuses of these works are not only on the changes, but also on the individual graphical model themselves, thus the direct differential parameter learning method is not useful.
+
+\section{Background}
+
+\subsection{Kullback-Leibler Importance Estimation Procedure (KLIEP) for Change Estimation} \label{subsec:KLIEP}
+
+We start by considering the problem of estimating the difference between a pair of graphs based on an independent pair of samples from each.
+
+Let $\mathcal{F} = \{f(\,\cdot\,;\fateta)\}$ be a parametric family of probability distributions supported on a subset $\mathbb{Y} \subseteq \RR^m$ of the form
+\begin{equation}
+f(\faty;\fateta)
+= Z(\fateta)^{-1} \exp\Big( \sum_{1\leq i\leq j\leq m} \eta_{ij} \, \psi_{ij}(y_i,y_j) \Big)
+\quad \text{with} \quad
+Z(\fateta) = \int \exp\Big( \sum_{1\leq i\leq j\leq m} \eta_{ij} \, \psi_{ij}(y_i,y_j) \Big) \, d\faty.
+\end{equation}
+When $\mathcal{Y}$ is discrete, the integral is understood as a sum.
+For notational convenience, we shall fix an ordering on the parameter components $\eta_{ij}$, and regard the parameter $\fateta$ as a vector.
+Thus, the above is expressed as
+\begin{equation}
+f(\faty;\fateta)
+= Z(\fateta)^{-1} \exp\left( \fateta^\top \fatpsi(\faty) \right)
+\quad \text{with} \quad
+Z(\fateta) = \int \exp\left( \fateta^\top \fatpsi(\faty) \right) \, d\faty.
+\end{equation}
+In the graphical model parlance, each $f(\,\cdot\,;\fateta)$ is a Markov random field modeling pairwise dependencies of $m$ nodes.
+
+This class of probability distributions includes many that occur frequently both in theory and in practice.
+
+\begin{example}
+$\mathcal{F}$ are Ising models on $m$ nodes if $\faty \in \{-1,+1\}^m$, $\psi(y_i,y_j) = y_iy_j$, and $\eta_{ij} \in \RR$ with $\eta_{ii} = 0$.
+\end{example}
+
+\begin{example}
+$\mathcal{F}$ are Gaussian graphical models on $m$ nodes if $\faty \in \RR^m$, $\psi(y_i,y_j) = y_iy_j$, and $\fatSigma^{-1} = -\fatLambda$ is positive definite, where $\fatLambda$ is the symmetric matrix with $\Lambda_{ij} = \Lambda_{ji} = \eta_{ij}$ if $i \neq j$, $\Lambda_{ii} = -2 \, \eta_{ii}$ else.
+\end{example}
+
+Suppose $f_x = f(\,\cdot\,;\fateta_x)$ and $f_y = f(\,\cdot\,;\fateta_y) \in \mathcal{F}$.
+Our goal is to estimate the change
+\begin{equation}
+\fattheta = \fateta_x - \fateta_y
+\end{equation}
+based on an independent pair of independent and identically distributed samples
+\begin{equation}
+\fatx^{(1)}, \dots, \fatx^{(n_x)} \sim f_x
+\quad\text{and}\quad
+\faty^{(1)}, \dots, \faty^{(n_y)} \sim f_y.
+\end{equation}
+
+It may appear that one would have to estimate both $\fateta_x$ and $\fateta_y$ before one could estimate their difference $\fattheta$.
+It turns out that this is unnecessary if we adopt the Kullback-Leibler importance estimation procedure (KLIEP), which arises from consideration of the ratio
+\begin{equation}
+r(\faty;\fattheta)
+= \frac{f_x(\faty)}{f_y(\faty)}
+= \frac{Z(\fateta_x)^{-1} \exp\left( \fateta_x^\top \fatpsi(\faty) \right)}{Z(\fateta_y)^{-1} \exp\left( \fateta_y^\top \fatpsi(\faty) \right)}
+= Z(\fattheta;\fateta_y)^{-1} \exp\left( \fattheta^\top \fatpsi(\faty) \right).
+\end{equation}
+We shall suppress the dependency on $\fateta_y$ in $Z(\fattheta;\fateta_y)$, and simply write $Z(\fattheta)$.
+KLIEP is based on the observation that for each fixed $\fateta_x$ and $\fateta_y$, the true difference $\fattheta^*$ minimizes the Kullback-Leibler divergence from $f_x$ to $r(\,\cdot\,;\fattheta) f_y$, i.e.
+\begin{equation}
+\begin{aligned}
+\fattheta^*
+&= \argmin_{\fattheta} \left\{ D_\text{KL}(f_x \,\|\, r(\,\cdot\,;\fattheta) f_y) \right\} \\
+&= \argmin_{\fattheta} \left\{ \int \log \left( \frac{f_x(\faty)}{r(\faty;\fattheta) f_y(\faty)} \right) f_x(\faty) \, d\faty \right\}
+= -\argmax_{\fattheta} \left\{ \int \log( r(\faty;\fattheta) ) f_x(\faty) \, d\faty \right\}.
+\end{aligned}
+\end{equation}
+Now,
+\begin{equation}
+\int \log( r(\faty;\fattheta) ) f_x(\faty) \, d\faty
+= \int \fattheta^\top \fatpsi(\faty) \, f_x(\faty) \, d\faty - \log Z(\fattheta)
+= \EE_x\Big[ \fattheta^\top \fatpsi(\fatx) \Big] - \log \EE_y\Big[ \exp\left( \fattheta^\top \fatpsi(\faty) \right) \Big],
+\end{equation}
+where the equivalence of the second terms in the last equality is because
+\begin{equation}
+\int r(\faty;\fattheta) f_y(\faty) \, d\faty
+= \int \frac{f_x(\faty)}{f_y(\faty)} f_y(\faty) \, d\faty
+= \int f_y(\faty) \, d\faty
+= 1,
+\end{equation}
+and so
+\begin{equation}
+\EE_y\left[ \exp\left( \fattheta^\top \fatpsi(\faty) \right) \right]
+= \int \exp\left( \fattheta^\top \fatpsi(\faty) \right) f_y(\faty) \, d\faty
+= Z(\fattheta) \int r(\faty;\fattheta) f_y(\faty) \, d\faty
+= Z(\fattheta).
+\end{equation}
+Thus,
+\begin{equation} \label{eq:EKLIEP}
+\fattheta^*
+= \argmin_{\fattheta} \Big\{ -\EE_x\Big[ \fattheta^\top \fatpsi(\fatx) \Big] + \log \EE_y\Big[ \exp\left( \fattheta^\top \fatpsi(\faty) \right) \Big] \Big\}.
+\end{equation}
+
+In practice, the expectations in (\ref{eq:EKLIEP}) are approximated by their empirical versions to form the empirical KLIEP loss
+\begin{equation}
+\begin{aligned}
+\ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal)
+&:= -\hat\EE_x\Big[ \fattheta^\top \fatpsi(\fatx^{(i)}) \Big] + \log \hat\EE_y\Big[ \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \Big] \\
+&= -\frac{1}{n_x} \sum_{i=1}^{n_x} \fattheta^\top \fatpsi(\fatx^{(i)}) + \log\left[ \frac{1}{n_y} \sum_{j=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \right].
+\end{aligned}
+\end{equation}
+Denote the sample estimate of $Z(\fattheta)$ by
+\begin{equation}
+\hat Z(\fattheta)
+= \hat Z(\fattheta;\Ycal)
+:= \hat\EE_y\left[ \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \right]
+= \frac{1}{n_y} \sum_{j=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right)
+\end{equation}
+and define
+\begin{equation}
+\hat r(\faty;\fattheta)
+= \hat r(\faty;\fattheta,\Ycal)
+:= \hat Z(\fattheta)^{-1} \exp\left( \fattheta^\top \fatpsi(\faty) \right),
+\end{equation}
+the plug-in estimate of the ratio $r(\faty;\fattheta)$.
+Direct computations yield
+\begin{equation}
+\nabla \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal)
+= -\frac{1}{n_x} \sum_{i=1}^{n_x} \fatpsi(\fatx^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) \hat r(\faty^{(j)};\fattheta)
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+\nabla^2 \ell_\text{KLIEP}(\fattheta;\Ycal)
+&= \fatPsi(\Ycal) \left[ \frac{1}{n_y} \diag(\hat\fatr(\Ycal;\fattheta)) - \frac{1}{n_y^2} \hat\fatr(\Ycal;\fattheta)\hat\fatr(\Ycal;\fattheta)^\top \right] \fatPsi(\Ycal)^\top \\
+&= \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right) \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right)^\top \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta)
+\end{aligned}
+\end{equation}
+where $\fatPsi(\Ycal)$ is the $p$-by-$n_y$-matrix whose $j$-th column is $\fatpsi(\faty^{(j)})$, the vector of sufficient statistics for the $j$-th $\faty$-sample, and $\hat \fatr(\Ycal;\fattheta)$ is the $n_y$-vector whose $j$-th component is $\hat r(\faty^{(j)};\fattheta)$, the $j$-th ratio estimate.
+
+We note that the Hessian depends on the data only through the $\faty$-samples.
+Moreover, it is clear from the form of the Hessian that $\ell_\text{KLIEP}$ is convex as a function of $\fattheta$, and that it is {\it never} strongly convex for $n_y \leq p$.
+Specifically, the Hessian is positive semi-definite with rank at most $n_y - 1$.
+This is why it is more desirable to choose $\faty$ as the larger of the two samples.
+This is especially the case when the estimates have to be de-biased, as we shall soon see.
+
+When $n_y$ is sufficiently large, we estimate $\fattheta$ as the minimizer of $\ell_\text{KLIEP}$
+\begin{equation}
+\hat\fattheta = \argmin_{\fattheta} \left\{ \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) \right\}.
+\end{equation}
+When $n_y \leq p$
+\begin{equation}
+\hat\fattheta_\lambda = \argmin_{\fattheta} \left\{ \ell_\text{KLIEP}(\fattheta;X,Y) + \lambda\|\fattheta\|_1 \right\}
+\quad \text{for some} \quad \lambda > 0
+\end{equation}
+has been shown to be consistent subject to conditions.
+
+\subsection{De-Biasing Procedures for High-Dimensional Estimators}
+
+We derive de-biasing procedures for constructing an asymptotically normal estimator of a scalar component of interest in the presence of a high-dimensional nuisance component using the outcome of penalized estimation procedures.
+For notational convenience, let $\ell(\fattheta) = \ell_\text{KLIEP}(\fattheta)$, and $\fattheta = (\theta_1,\fattheta_2)$, where $\theta_1 \in \RR$ is considered the target and $\fattheta_2 \in \RR^{p-1}$, the nuisance.
+We denote the true value of the parameter as $\fattheta^*$.
+Although our exposition occurs in the context of KLIEP, $\ell$ can be any convex loss with first derivatives decomposing into a sum of independent terms and second derivatives satisfying certain regularity conditions, e.g.~$\ell \in \mathscr{C}^2(\RR^p \to \RR)$.
+
+Suppose we would like to make a valid statistical statement about $\theta_1$.
+Examples include conducting hypothesis tests or constructing confidence intervals at level $\alpha \in (0,1)$.
+
+In the unlikely scenario in which we have access to the true nuisance parameter $\fattheta_2^*$, we can plug $\fattheta_2^*$ into $\ell$ to obtain $\ell(\,\cdot\,,\fattheta_2)$, which is now a function defined on the real line.
+Knowing $\fattheta_2^*$ effectively reduces the dimension of the estimation problem to one, and there is no need to distinguish between a high-dimensional setting and a low-dimensional one.
+
+Of course, it is highly unlikely that $\fattheta_2^*$ is ever known to us, but we usually have ways of estimating it consistently.
+By analogy to the infeasible case, given an estimator $\check\fattheta_2$, the intuitive thing to do may be to plug it into $\ell$ and solve the resulting one-dimensional problem.
+However, the particular setting does turn out to matter in this case, and the intuitive solution may or may not be correct.
+
+To see why, consider the Taylor expansion of $\ell$ about $\fattheta^*$:
+\begin{equation} \label{eq:Taylor_line1}
+\partial_1 \ell(\theta_1,\fattheta_2)
+= \partial_1 \ell(\theta_1^*,\fattheta_2^*) + \bar\Hb_{11} (\theta_1 - \theta_1^*) + \bar\Hb_{12} (\fattheta_2 - \fattheta_2^*),
+\end{equation}
+where $\bar\Hb_{11}$ and $\bar\Hb_{12}$ are sub-matrices of the matrix
+\begin{equation} \label{eq:rem}
+\bar\Hb
+= \bar\Hb(\fattheta)
+= \begin{bmatrix} \bar\Hb_{11}(\fattheta) & \bar\Hb_{12}(\fattheta) \\ \bar\Hb_{21}(\fattheta) & \bar\Hb_{22}(\fattheta) \end{bmatrix}
+= \int_0^1 \nabla^2 \ell\big( \fattheta^* + t (\fattheta-\fattheta^*) \big) \, dt.
+\end{equation}
+Suppose we were to adapt the plug-in approach to obtain $\check\fattheta = (\check\theta_1,\check\fattheta_2)$.
+The corresponding Taylor expansion is got by setting $\theta_1 = \check\theta_1$, $\fattheta_2 = \check\fattheta_2$.
+In this case, the left-hand side of (\ref{eq:Taylor_line1}) is identically zero by definition of $\check\theta_1$, and the first term on the right-hand side converges to a centered normal distribution for most loss functions that are seen in practice.
+Since $\bar\Hb_{11}$ can be shown to be invertible with high probability if the population covariance is invertible, $\check\theta_1$ will converge to a normal distribution provided that $\check\fattheta_2$ is itself asymptotically normal and unbiased.
+
+When $n \gg p$, it is easy to obtain an estimator of the nuisance parameter that is already asymptotically normal and unbiased.
+Indeed, minimizing the full loss and accounting for the variance in the nuisance part of the estimated parameter vector yields a valid inference for $\theta_1$.
+Things are more delicate when $n_y \ll p$, as it is usually impossible to estimate high-dimensional parameters consistently without introducing some bias.
+Moreover, most high-dimensional procedures imply some form of variable selection, and the limiting distribution of the resulting estimators are intractable in general.
+Thus, the plug-in approach yields a valid procedure in the classical setting, but this validity fails to carry over into the high-dimensional regimes.
+
+De-biasing techniques attempts to remedy this issue in high-dimensions, at least for cases when some structural assumptions are satisfied.
+The key idea that is common to these methods is to temper the effect of a perturbation in the nuisance component by re-expressing $\fattheta_2 - \fattheta_2^*$ in terms of the higher-order terms of the Taylor expansion.
+This is related to Neyman's construction of the $C(\alpha)$ test.
+
+To explore this idea in more detail, we look at the full Taylor expansion with respect to not only the parameter of interest but also the nuisance component.
+\begin{align}
+\label{eq:Taylor1}
+\partial_1 \ell(\theta_1,\fattheta_2)
+&= \partial_1 \ell(\theta_1^*,\fattheta_2^*) + \bar\Hb_{11} (\theta_1 - \theta_1^*) + \bar\Hb_{12} (\fattheta_2 - \fattheta_2^*), \\
+\label{eq:Taylor2}
+\partial_2 \ell(\theta_1,\fattheta_2)
+&= \partial_2 \ell(\theta_1^*,\fattheta_2^*) + \bar\Hb_{21} (\theta_1 - \theta_1^*) + \bar\Hb_{22} (\fattheta_2 - \fattheta_2^*).
+\end{align}
+When $\fattheta = (\theta_1,\fattheta_2)$ is sufficiently close to $\fattheta^* = (\theta_1^*,\fattheta_2^*)$, we expect $\bar\Hb$ to be close to $\Hb^* = \nabla^2 \ell(\fattheta^*)$, and hence, to $\Ib^* = \EE\Hb^* = \EE\nabla^2 \ell(\fattheta^*)$.
+Thus, it is helpful to re-write (\ref{eq:Taylor1}) and (\ref{eq:Taylor2}) as
+\begin{align}
+\label{eq:proxy_Taylor1}
+\partial_1 \ell(\theta_1,\fattheta_2)
+&= \partial_1 \ell(\theta_1^*,\fattheta_2^*) + \Ib^*_{11} (\theta_1 - \theta_1^*) + \Ib^*_{12} (\fattheta_2 - \fattheta_2^*) + \Delta_1, \\
+\label{eq:proxy_Taylor2}
+\partial_2 \ell(\theta_1,\fattheta_2)
+&= \partial_2 \ell(\theta_1^*,\fattheta_2^*) + \Ib^*_{21} (\theta_1 - \theta_1^*) + \Ib^*_{22} (\fattheta_2 - \fattheta_2^*) + \fatDelta_2,
+\end{align}
+where
+\begin{equation}
+\fatDelta
+= \begin{bmatrix} \Delta_1 \\ \fatDelta_2 \end{bmatrix}
+= \begin{bmatrix} [ \bar\Hb_{11} - \Ib^*_{11} ] (\theta_1 - \theta_1^*) + [ \bar\Hb_{12} - \Ib^*_{12} ] (\fattheta_2 - \fattheta_2^*) \\ [ \bar\Hb_{21} - \Ib^*_{21} ] (\theta_1 - \theta_1^*) + [ \bar\Hb_{22} - \Ib^*_{22} ] (\fattheta_2 - \fattheta_2^*) \end{bmatrix}
+= [ \bar\Hb - \Ib^* ] (\fattheta - \fattheta^*)
+\end{equation}
+is expected to be small.
+
+Suppose $\Ib^*$ is invertible.
+In most concrete problems, this would amount to assuming that a population covariance is strictly positive definite.
+By the Schur complement condition, both $\Ib^*_{22}$ and its Schur complement $\Ib^*_{11} - \Ib^*_{12} \Ib^{*-1}_{22} \Ib^*_{21}$ are positive definite, so (\ref{eq:proxy_Taylor2}) can be solved for $\fattheta_2 - \fattheta_2^*$ as
+\begin{equation} \label{eq:approx_diff_nui}
+\fattheta_2 - \fattheta_2^*
+= \Ib^{*-1}_{22} \left( \partial_2 \ell(\theta_1,\fattheta_2) - \partial_2 \ell(\theta_1^*,\fattheta_2^*) - \Ib^*_{21} (\theta_1 - \theta_1^*) - \fatDelta_2 \right).
+\end{equation}
+Substituting (\ref{eq:approx_diff_nui}) into (\ref{eq:proxy_Taylor1}),
+\begin{multline}
+\partial_1 \ell(\theta_1,\fattheta_2) - \Ib^*_{12} \Ib^{*-1}_{22} \partial_2 \ell(\theta_1,\fattheta_2) \\
+= \partial_1 \ell(\theta_1^*,\fattheta_2^*) - \Ib^*_{12} \Ib^{*-1}_{22} \partial_2 \ell(\theta_1^*,\fattheta_2^*) + (\Ib^*_{11} - \Ib^*_{12} \Ib^{*-1}_{22} \Ib^*_{21}) (\theta_1 - \theta_1^*)  + \Delta_1 - \Ib^*_{12} \Ib^{*-1}_{22} \fatDelta_2,
+\end{multline}
+or, equivalently,
+\begin{multline} \label{eq:Taylor_orth_score}
+\left\langle \begin{bmatrix} 1 \\ -\Ib^*_{12} \Ib^{*-1}_{22} \end{bmatrix},
+\begin{bmatrix} \partial_1 \ell(\theta_1,\fattheta_2) \\ \partial_2 \ell(\theta_1,\fattheta_2) \end{bmatrix} \right\rangle \\
+=
+\left\langle \begin{bmatrix} 1 \\ -\Ib^*_{12} \Ib^{*-1}_{22} \end{bmatrix},
+\begin{bmatrix} \partial_1 \ell(\theta_1^*,\fattheta_2^*) \\ \partial_2 \ell(\theta_1^*,\fattheta_2^*) \end{bmatrix} \right\rangle
++ (\Ib^*_{11} - \Ib^*_{12} \Ib^{*-1}_{22} \Ib^*_{21}) (\theta_1 - \theta_1^*)
++ \left\langle \begin{bmatrix} 1 \\ -\Ib^*_{12} \Ib^{*-1}_{22} \end{bmatrix},
+\begin{bmatrix} \Delta_1 \\ \fatDelta_2 \end{bmatrix} \right\rangle.
+\end{multline}
+
+Thus, by leveraging (\ref{eq:proxy_Taylor2}) to find an expression for $\fattheta_2 - \fattheta_2^*$ in terms of the linear and quadratic terms of the nuisance Taylor expansion, we have succeeded in removing the lower-order effects of perturbation in $\fattheta_2$ from the Taylor expansion for $\theta_1$.
+
+Now, the block matrix inversion formula says the row of the inverse of $\Ib^*$ corresponding to the parameter of interest is precisely
+\begin{equation}
+\fatomega^{*\top}
+:= (\Ib^*_{11} - \Ib^*_{12} \Ib^{*-1}_{22} \Ib^*_{21})^{-1} \begin{bmatrix} 1 & -\Ib^*_{12} \Ib^{*-1}_{22} \end{bmatrix},
+\end{equation}
+the vector that defines the modified score up to the scalar $(\Ib^*_{11} - \Ib^*_{12} \Ib^{*-1}_{22} \Ib^*_{21})^{-1}$.
+Thus, (\ref{eq:Taylor_orth_score}) is equivalent to
+\begin{equation} \label{eq:infeasible_Bahadur}
+\sqrt{n} \, (\theta_1 - \theta_1^*)
+-\sqrt{n} \, \langle \fatomega^*, \nabla \ell(\theta_1,\fattheta_2) \rangle
+=
+-\sqrt{n} \, \langle \fatomega^*, \nabla \ell(\theta_1^*,\fattheta_2^*) \rangle
+-\sqrt{n} \, \langle \bar\Hb \fatomega^* - \fate_1, \fattheta - \fattheta^* \rangle.
+\end{equation}
+
+Ignoring the issue of not knowing $\fatomega^*$ for the moment, (\ref{eq:infeasible_Bahadur}) is nearly the expansion we want.
+If $\hat\fattheta = (\hat\theta_1,\hat\fattheta_2)$ can be chosen as a solution to
+\begin{equation}
+\langle \fatomega^*, \nabla \ell(\theta_1,\fattheta_2) \rangle = 0,
+\end{equation}
+then provided that the last term is negligible in the limit, $\theta_1$ must be asymptotically normal and unbiased, because the first term on the right-hand side usually converges to a centered normal distribution by some form of the central limit theorem.
+
+As $\fatomega^*$ is also a population-level quantity, it must be estimated from the data.
+We study the effect of the perturbation in $\fatomega$ on (\ref{eq:infeasible_Bahadur}).
+\begin{multline} \label{eq:feasible_Bahadur}
+\sqrt{n} \, (\theta_1 - \theta_1^*)
+-\sqrt{n} \, \langle \fatomega, \nabla \ell(\theta_1,\fattheta_2) \rangle \\
+=
+-\sqrt{n} \, \langle \fatomega^*, \nabla \ell(\theta_1^*,\fattheta_2^*) \rangle
+-\sqrt{n} \, \langle \fatomega - \fatomega^*, \nabla \ell(\theta_1,\fattheta_2) \rangle
+-\sqrt{n} \, \langle \bar\Hb \fatomega^* - \fate_1, \fattheta - \fattheta^* \rangle.
+\end{multline}
+
+Given a ``good" estimator $\hat\fatomega$ of $\fatomega^*$, we have two ways of obtaining $\hat\theta_1$.
+The first procedure, double selection, first estimates the support of $\fattheta^*$ and $\fatomega^*$ via $\check\fattheta$ and $\check\fatomega$, and then re-estimates both parameters restricting to the union of the estimated supports $\supp(\check\fattheta) \cup \supp(\check\fatomega)$.
+The resulting pair automatically satisfies
+\begin{equation}
+\langle \hat\fatomega, \nabla \ell(\hat\theta_1^\text{ds},\hat\fattheta_2) \rangle = 0
+\end{equation}
+by the first-order conditions of the re-fitting problem.
+The implied linear representation is
+\begin{multline}
+\sqrt{n} \, (\hat\theta_1^\text{ds} - \theta_1^*) \\
+=
+-\sqrt{n} \, \langle \fatomega^*, \nabla \ell(\theta_1^*,\fattheta_2^*) \rangle
+-\sqrt{n} \, \langle \hat\fatomega - \fatomega^*, \nabla \ell(\hat\theta_1,\hat\fattheta_2) \rangle
+-\sqrt{n} \, \langle \bar\Hb \fatomega^* - \fate_1, \hat\fattheta - \fattheta^* \rangle.
+\end{multline}
+
+The second, one-step, obtains $\check\fattheta$ and $\check\fatomega$ via penalized estimation procedures, and computes
+\begin{equation}
+\hat\theta_1^\text{1step} = \check\theta_1 - \langle \check\fatomega, \nabla \ell(\check\theta_1,\check\fattheta_2) \rangle.
+\end{equation}
+Then, $\sqrt{n} \, (\hat\theta_1^\text{1step} - \theta_1^*)$ is exactly the left-hand side of the expansion in (\ref{eq:feasible_Bahadur}) so that the implied linear representation is
+\begin{multline}
+\sqrt{n} \, (\hat\theta_1^\text{1step} - \theta_1^*) \\
+=
+-\sqrt{n} \, \langle \fatomega^*, \nabla \ell(\theta_1^*,\fattheta_2^*) \rangle
+-\sqrt{n} \, \langle \check\fatomega - \fatomega^*, \nabla \ell(\check\theta_1,\check\fattheta_2) \rangle
+-\sqrt{n} \, \langle \bar\Hb \fatomega^* - \fate_1, \check\fattheta - \fattheta^* \rangle.
+\end{multline}
+
+Note that $\bar\Hb \fatomega^* - \fate_1$ is approximately the gradient evaluated at $\fatomega^*$ of the loss
+\begin{equation}
+\ell_\text{de-bias}(\fatomega)
+:= \frac{1}{2} \fatomega^\top \nabla^2 \ell(\check\fattheta) \fatomega - \fatomega^\top \fate_1.
+\end{equation}
+This is used to estimate the row of the inverse of the Hessian at $\fattheta^*$, as $\fatomega^*$ is the minimizer of
+\begin{equation}
+\ell_\text{de-bias}^*(\fatomega)
+:= \frac{1}{2} \fatomega^\top \EE\nabla^2 \ell(\fattheta^*) \fatomega - \fatomega^\top \fate_1.
+\end{equation}
+Similarly, $\nabla \ell(\hat\fattheta)$ or $\nabla \ell(\check\fattheta)$ approximates $\nabla \ell(\fattheta^*)$ well when the estimate is consistent and the second-derivative is regular, e.g.~bounded near $\fattheta^*$.
+When the estimators are obtained via $\ell^1$-regularization, the existing theory tells us to expect that both the remainder terms can be controlled so long as
+\begin{equation} \label{eq:consistency}
+\sqrt{n} \|\tilde\fatomega - \fatomega^*\|_1 \|\tilde\fattheta - \fattheta^*\|_1 \to 0,
+\end{equation}
+where $(\tilde\fattheta,\tilde\fatomega) = (\hat\fattheta,\hat\fatomega)$ for double selection and $(\tilde\fattheta,\tilde\fatomega) = (\check\fattheta,\check\fatomega)$ for one-step, at a rate that exceeds the rate of convergence to the normal.
+This can be done e.g.~when $\fattheta^*$ and $\fatomega^*$ are appropriately sparse.
+
+So far, we have presented our argument assuming a single scalar component of interest.
+Both procedures we derived generalize easily to the setting in which there are multiple components of interest.
+Let $I \subseteq [p]$ denote the set of indices that we desire to de-bias.
+In the case of double selection, having obtained an initial approximation $\check\fattheta$, one would estimate $\fatomega^{(k)}$ for each $k \in I$ and re-compute both $\hat\fattheta^{(k)}$ and $\hat\fatomega^{(k)}$ restricting to $\supp(\check\fattheta) \cup \supp(\check\fatomega^{(k)})$, keeping only the $k$-th component $\hat\fattheta^{(k)}_k$.
+For one-step, one estimates $\fatomega^{(k)}$ for each $k \in I$ as before, and computes
+\begin{equation}
+\hat\fattheta_I = \check\fattheta_I - \check\fatOmega_I^\top \nabla \ell(\check\fattheta_I,\check\fattheta_{I^c}),
+\end{equation}
+where $\fatOmega_I$ is the $p \times |I|$-matrix whose columns are $\fatomega^{(k)}$ for $k \in I$.
+
+\begin{algorithm}[t]
+\caption{Double Selection}
+\label{algo:2selection}
+\KwIn{A set of indices $I \subseteq [p]$ corresponding to components of interest,
+an independent pair of i.i.d.~samples $\Xcal = \{\fatx^{(1)}, \dots, \fatx^{(n_x)}\}, \Ycal = \{\faty^{(1)}, \dots, \faty^{(n_y)}\}$,
+a pair of regularizing parameters $\lambda_1, \lambda_2 > 0$.}
+\KwOut{An asymptotically normal and de-biased estimator $\hat\fattheta_I$ of $\fattheta_I$.}
+\emph{Run selection on $\fattheta$:}
+\begin{flalign*}
+\check\fattheta
+&\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) + \lambda_1 \|\fattheta\|_1. &\\
+\textit{(Optional)} \quad
+\check\fattheta
+&\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) : \supp(\fattheta) \subseteq \supp(\check\fattheta). &
+\end{flalign*}
+\For{$k \in I$}{
+\emph{Run selection on $\fatomega^{(k)}$:}
+\begin{equation*}
+\check\fatomega^{(k)}
+\leftarrow \argmin_{\fatomega} \tfrac{1}{2}\fatomega^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta)\fatomega - \fatomega^\top \fate_k + \lambda_2 \|\fatomega\|_1.
+\end{equation*}
+
+\emph{Fit to the doubly-selected support:}
+\begin{equation*}
+\hat\fattheta^{(k)}
+\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) : \supp(\fattheta) \subseteq \supp(\check\fattheta) \cup \supp(\check\fatomega^{(k)}).
+\end{equation*}
+
+\emph{Keep the $k$-th component, discard the rest:}
+\begin{equation*}
+\hat\theta_k
+\leftarrow \langle \fate_k, \hat\fattheta^{(k)} \rangle.
+\end{equation*}}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{One-Step}
+\label{algo:1step}
+\KwIn{A set of indices $I \subseteq [p]$ corresponding to components of interest,
+an independent pair of i.i.d.~samples $\Xcal = \{\fatx^{(1)}, \dots, \fatx^{(n_x)}\}, \Ycal = \{\faty^{(1)}, \dots, \faty^{(n_y)}\}$,
+a pair of regularizing parameters $\lambda_1, \lambda_2 > 0$.}
+\KwOut{An asymptotically normal and de-biased estimator $\hat\fattheta_I$ of $\fattheta_I$.}
+\emph{Compute an initial approximation to $\fattheta$:}
+\begin{flalign*}
+\check\fattheta
+&\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) + \lambda_1 \|\fattheta\|_1. &\\
+\textit{(Optional)} \quad
+\check\fattheta
+&\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta;\Xcal,\Ycal) : \supp(\fattheta) \subseteq \supp(\check\fattheta). &
+\end{flalign*}
+\For{$k \in I$}{
+\emph{Compute an initial approximation to $\fatomega$:}
+\begin{flalign*}
+\check\fatomega^{(k)}
+&\leftarrow \argmin_{\fatomega} \tfrac{1}{2}\fatomega^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta)\fatomega - \fatomega^\top \fate_1 + \lambda_2 \|\fatomega\|_1. &\\
+\textit{(Optional)} \quad
+\check\fatomega^{(k)}
+&\leftarrow \argmin_{\fatomega} \tfrac{1}{2}\fatomega^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta)\fatomega - \fatomega^\top \fate_1 : \supp(\fatomega) \subseteq \supp(\check\fatomega^{(k)}). &
+\end{flalign*}}
+\emph{Take one Newton step:}
+\begin{equation*}
+\hat\fattheta_I \leftarrow \check\fattheta_I - \fatOmega_I^\top \nabla \ell_\text{KLIEP}(\check\fattheta).
+\end{equation*}
+\end{algorithm}
+
+\section{De-Biasing Sparse KLIEP}
+
+All our analyses assume a correct model, i.e.
+\begin{equation}
+f_x(\faty)=r(\faty;\fattheta^*) f_y(\faty) \quad\text{for some}\quad \fattheta^* \in \RR^p.
+\end{equation}
+In other words, $f_x$ and $f_y$ belong to the same parametric family.
+
+We summarize the conditions we need in order to de-bias sparse KLIEP.
+First, the de-biasing methods based on Neyman's orthogonalization need $\fatomega_{n_y}^*$ to be well-defined, and this is the case when $\EE_{n_y} \nabla^2 \ell_\text{KLIEP}(\fattheta^*)$ is invertible.
+Since $\EE_{n_y} \nabla^2 \ell_\text{KLIEP}(\fattheta^*)$ is symmetric, this is equivalent to assuming that the minimum eigenvalue is strictly positive.
+
+\begin{assumption} \label{hyp:invertibility}
+$\EE_{n_y} \nabla^2 \ell(\fattheta^*)$ has strictly positive eigenvalues, i.e.
+\begin{equation}
+\lambda_{\min} := \lambda_{\min}\left[ \EE_{n_y} \nabla^2 \ell(\fattheta^*) \right] > 0.
+\end{equation}
+\end{assumption}
+
+Next, in order for the constructed estimator to converge to a normal distribution, $\langle \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle$, the leading term in the linear representation, must converge to a normal distribution.
+In our case, $\nabla \ell_\text{KLIEP}(\fattheta^*)$ can be regarded as an $\fatx$-sample average, so asymptotic normality comes as a natural consequence of the central limit theorem.
+
+It remains to verify that the remaining terms are negligible.
+We have seen that this hinges on finding a pair of estimators $(\tilde\fattheta,\tilde\fatomega)$ such that
+\begin{equation*}
+\sqrt{n} \, \|\tilde\fatomega - \fatomega_{n_y}^*\|_1 \|\tilde\fattheta - \tilde\fattheta^*\|_1 \to 0
+\end{equation*}
+sufficiently fast provided that $\ell_\text{KLIEP}$ satisfies some regularity conditions near $\fattheta^*$.
+
+Usually, finding {\color{red} fast-rate (What is the correct terminology?)} estimators comes at the cost of putting additional structural assumptions.
+Here, we require $\fattheta$ and $\fatomega$ to be sparse in the sense of Assumption \ref{hyp:sparsity}.
+
+\begin{assumption}[sparsity] \label{hyp:sparsity}
+Given a sequence of parameter dimensions $p = p(n) \to \infty$ and two sequences of sparsity levels $s_1 = s_1(n) \to \infty$ and $s_2 = s_2(n) \to \infty$, $s = s_1 \vee s_2$ with
+\begin{equation}
+\lim_{n \to \infty} \frac{s^{5/2} \log p}{\sqrt{n}} = 0,
+\end{equation}
+there exist two sequences of subsets $S_1, S_2 \subseteq [p]$ with $|S_1| = s_1$, $|S_2| = s_2$ such that
+\begin{enumerate}
+\item $\supp(\fattheta^*) \subseteq S_1$,
+\item $\supp(\fatomega_{n_y}^*) \setminus S_2$ is small in the sense that
+\begin{equation}
+\|\fatomega_{n_y,S_2^c}^*\|_1 \leq C_\omega \sqrt{\frac{\log p}{n_y}} \, \|\fatomega_{n_y,S_2}^*\|_1.
+\end{equation}
+\end{enumerate}
+for some constant $C_\omega > 0$.
+\end{assumption}
+
+The estimators in the particular formulations of our procedure in Algorithms \ref{algo:ds} or \ref{algo:1step} are either the solution to an $\ell^1$-regularized optimization problem or a refitting problem post such a regularized procedure.
+There is a wealth of literature on the consistency properties of such estimators, and the existing theory tells us to look for two things: the restricted strong convexity of the Hessian and a bound in the dual norm of the gradient.
+
+Translated to the problem of density ratio estimation, the main hurdle that must be overcome is a control on the random quantity
+\begin{equation}
+r(\faty;\fattheta) = Z(\fattheta)^{-1} \exp\left( \fattheta^\top \fatpsi(\faty) \right).
+\end{equation}
+This turns out to be the key to ensuring that both the Hessian and the gradient behave nicely.
+
+Ideally, we would like the ratio random variable to be essentially bounded.
+When it is actually a bounded random variable for a bounded range of $\fattheta$ values --- and we shall show that this effectively implies that the sufficient statistics $\fatpsi(\faty)$ is bounded --- we can show that the $\ell^1$-regularized estimators, $\check\fattheta$ and $\check\fatomega$, or the re-fitted ones, $\hat\fattheta$ and $\hat\fatomega$, have the required rate of convergence, and hence the remainder terms can be ignored subject to sample complexity conditions.
+This is the topic of Section \ref{subsec:BSS}.
+
+Admittedly, boundedness is rather restrictive, and we would like to extend theoretical guarantees to settings in which the ratio is allowed to be unbounded.
+A slight relaxation is to assume that $r(\faty;\fattheta)$ are sub-Gaussian locally in $\fattheta$.
+\begin{equation}
+\EE_y\left[ \exp\left( t \left( r(\faty;\fattheta) - 1 \right) \right) \right] \leq e^{10 t^2} \quad\text{for all}\quad \fattheta \in \mathcal{U}(\fattheta^*).
+\end{equation}
+However, this is never satisfied e.g.~for the Gaussian mean shift problem $\fatx \sim \Ncal(\fatmu_x,\fatSigma)$ and $\faty \sim \Ncal(\fatmu_y,\fatSigma)$ or for the Gaussian covariance shift problem $\fatx \sim \Ncal(\fatmu,\Lambda_x^{-1})$ and $\faty \sim \Ncal(\fatmu,\Lambda_y^{-1})$ with $\Lambda_x^{-1} - \Lambda_y^{-1} \not\succeq 0$ in any dimension, Section \ref{sec:GGM}.
+
+\subsection{Bounded Case} \label{subsec:bdd}
+
+In this section, we discuss the theoretical validity of our proposed de-biasing procedure when the ratio $r(\faty;\fattheta)$ is a bounded random variable.
+
+\begin{assumption}[bounded density ratio] \label{hyp:bdd_den_ratio}
+There exist a bounded neighborhood $\mathcal{U}(\fattheta^*) \ni \fattheta^*$, and a pair of constants $0 < m_r \leq M_r < \infty$, possibly depending on $\mathcal{U}(\fattheta^*)$, such that
+\begin{equation}
+m_r \leq r(\faty;\fattheta) \leq M_r \quad\text{a.s.} \quad\text{for all}\quad \fattheta \in \mathcal{U}(\fattheta^*).
+\end{equation}
+\end{assumption}
+
+\noindent
+When $r(\faty;\fattheta)$ is bounded, the empirical ratio $\hat r(\faty;\fattheta)$ is a bounded random variable also.
+\begin{equation}
+\begin{aligned}
+\hat r(\faty;\fattheta)
+&= \frac{\exp\left( \fattheta^\top \fatpsi(\faty) \right)}{\frac{1}{n_y} \sum_{j=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right)} \\
+&= \frac{Z(\fattheta)^{-1} \exp\left( \fattheta^\top \fatpsi(\faty) \right)}{\frac{1}{n_y} \sum_{j=1}^{n_y} Z(\fattheta)^{-1} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right)}
+= \frac{r(\faty;\fattheta)}{\frac{1}{n_y} \sum_{j=1}^{n_y} r(\faty^{(j)};\fattheta)},
+\end{aligned}
+\end{equation}
+so that
+\begin{equation}
+m_r/M_r \leq \hat r(\faty;\fattheta) \leq M_r/m_r \quad\text{a.s.}\quad \text{for all} \quad \fattheta \in \mathcal{U}(\fattheta^*).
+\end{equation}
+
+\noindent
+But there is more.
+Indeed, it turns out that $r(\faty;\fattheta)$ is bounded if and only if the sufficient statistics $\fatpsi(\faty)$ is bounded.
+This is a useful characterization, as it is easer to check.
+
+\begin{prop}[bounded sufficient statistics]
+Assumption \ref{hyp:bdd_den_ratio} is satisfied if and only if
+\begin{equation}
+\|\fatpsi(\faty)\|_\infty = \max_k |\psi_k(\faty_k)| \leq M_\psi \quad\faty\text{-a.s.}\quad\text{for some}\quad M_\psi < \infty.
+\end{equation}
+\end{prop}
+\begin{proof}
+See Appendix \ref{}.
+\end{proof}
+
+\noindent
+For simplicity, fix
+\begin{equation}
+\mathcal{U}(\fattheta^*) = \{ \fattheta : \|\fattheta - \fattheta^*\|_1 < \|\fattheta^*\|_2 \}.
+\end{equation}
+
+We need some assumptions on the population covariance of $\fatpsi(\faty)$ in order to guarantee a restricted strong convexity for the Hessian.
+Denote the population mean and covariance of $\fatpsi(\faty)$ by $\fatmu_{\psi(y)}$ and $\fatSigma_{\psi(y)}$, i.e.
+\begin{equation}
+\fatmu_{\psi(y)}
+:= \EE_y\left[ \fatpsi(\faty) \right]
+= \int \fatpsi(\faty) f_y(\faty) \, d\faty
+\end{equation}
+and
+\begin{multline}
+\fatSigma_{\psi(y)}
+:= \EE_y\left[ \left( \fatpsi(\faty) - \fatmu_{\psi(y)} \right) \left( \fatpsi(\faty) - \fatmu_{\psi(y)} \right)^\top \right] \\
+= \int \left( \fatpsi(\faty) - \fatmu_{\psi(y)} \right) \left( \fatpsi(\faty) - \fatmu_{\psi(y)} \right)^\top f_y(\faty) \, d\faty.
+\end{multline}
+
+\begin{assumption}[restricted eigenvalue] \label{hyp:RE}
+\begin{equation}
+\kappa^*
+:= \min_{\substack{S \subseteq [p] \\ |S| \leq s}} \min_{\substack{\fatv \neq \mathbf{0} \\ \|\fatv_{S^c}\|_1 \leq 9\|\fatv_S\|_1}} \frac{\fatv^\top \fatSigma_{\psi(y)} \fatv}{\|\fatv_S\|_2^2}
+> 0.
+\end{equation}
+\end{assumption}
+
+\noindent
+Define
+\begin{equation}
+d:= s\left( 1 + C_d \, \bar\sigma_{\psi(y)}^2 / \kappa^* \right),
+\end{equation}
+where $C_d > 0$ is an absolute constant, and $\bar\sigma_{\psi(y)}^2$ is the maximum diagonal entry of $\fatSigma_{\psi(y)}$.
+
+\begin{assumption}[min $d$-sparse eigenvalue] \label{hyp:min_sparse_eigval}
+$d \leq p$, and
+\begin{equation}
+\rho_d^*
+:= \min_{\substack{\fatv \neq \mathbf{0} \\ \|\fatv\|_0 = d}} \frac{\fatv^\top \fatSigma_{\psi(y)} \fatv}{\|\fatv\|_2^2} > 0.
+\end{equation}
+\end{assumption}
+
+\noindent
+Per Remark 25 in (Rudelson and Zhao, 2013), this assumption is necessary for a bounded $\fatpsi(\faty)$.
+
+We need some notations before we state the restricted strong convexity condition satisfied by the Hessian.
+
+For a subset of indices $S \subseteq [p]$, we decompose each $\fatv \in \RR^p$ as $\fatv = \fatv_S + \fatv_{S^c}$, where $\fatv_S$ is the projection of $\fatv$ onto the subspace associated to $S$ and $\fatv_{S^c}$ is the complementary projection, i.e.~$(\fatv_S)_k = v_k$ if $k \in S$ and $(\fatv_S)_k = 0$ if $k \notin S$.
+
+Given any $\fatv^* \in \RR^p$ and any $S \subseteq [p]$, define a set $\mathcal{E}(S;\fatv^*)$ as
+\begin{equation}
+\mathcal{E}(S;\fatv^*)
+:= \{ \fatv \in \RR^p : \|\fatv_{S^c}\|_1 \leq 3 \|\fatv_S\|_1 + 4 \| \fatv_{S^c}^*\|_1 \}.
+\end{equation}
+When $\supp(\fatv^*) \subseteq S$, $\|\fatv_{S^c}^*\|_1 = 0$, making $\mathcal{E}(S;\fatv^*)$ a cone.
+In this case, $\fatv \in \mathcal{E}(S;\fatv^*)$ satisfies
+\begin{equation} \label{eq:1norm_bd_cone}
+\|\fatv\|_1
+\leq \|\fatv_S\|_1 + \|\fatv_{S^c}\|_1
+\leq 4\|\fatv_S\|_1
+\leq 4 \sqrt{|S|} \|\fatv_S\|
+\leq 4 \sqrt{|S|} \|\fatv\|.
+\end{equation}
+When $\supp(\fatv^*) \not\subseteq S$, $\|\fatv_{S^c}^*\|_1 > 0$, and we have instead
+\begin{equation} \label{eq:1norm_bd_gen}
+\|\fatv\|_1
+\leq 4\sqrt{|S|}\|\fatv\| + 4\|\fatv_{S^c}^*\|_1.
+\end{equation}
+
+\begin{prop}
+Let $\fattheta \in \mathcal{U}(\fattheta^*)$.
+Let
+\begin{equation}
+\mathcal{E}_1 := \mathcal{E}(S_1;\fattheta^*)
+\quad \text{and} \quad
+\mathcal{E}_2 := \mathcal{E}(S_2;\fatomega_{n_y}^*).
+\end{equation}
+Then, with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s) - 2 / p$,
+\begin{enumerate}
+\item for all $\fatv \in \mathcal{E}_1$,
+\begin{equation}
+\fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv \geq \left( \kappa_1 - \kappa_2 \frac{s_1 \log p}{n_y} \right) \|\fatv\|^2,
+\end{equation}
+\item for all $\fatv \in \mathcal{E}_2$,
+\begin{multline}
+\fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv
+\geq \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \|\fatv\|^2 \\
+- \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} \right) \|\fatv\| - \tau_4 s_2 \left( \frac{\log p}{n_y} \right)^2.
+\end{multline}
+\end{enumerate}
+$\kappa_1, \kappa_2, \tau_1, \tau_2, \tau_3, \tau_4 > 0$ are constants defined in the proof.
+\end{prop}
+
+\subsection{Gaussian Case} \label{sec:GGM}
+
+\begin{prop}
+Let $\fattheta \in \mathcal{U}(\fattheta^*)$.
+If
+\begin{equation}
+\EE_y\left[ \exp\left( t \left( r(\faty;\fattheta) - 1 \right) \right) \right] \leq e^{10 t^2} \quad \text{for all} \quad t \in \RR,
+\end{equation}
+then
+\end{prop}
+
+\begin{proof}
+\begin{equation}
+\EE_y\left[ \exp\left( t \left( r(\faty;\fattheta) - 1 \right) \right) \right] \leq e^{10 t^2}
+\end{equation}
+if and only if
+\begin{equation}
+\PP_y\left\{ r(\faty;\fattheta) > 1+t \right\} \leq e^{-t^2 / 40}
+\quad\text{and}\quad
+\PP_y\left\{ r(\faty;\fattheta) < 1-t \right\} \leq e^{-t^2 / 40}
+\quad\text{for all}\quad t > 0.
+\end{equation}
+We note that the second inequality is nontrivial only for $t \in (0,1)$.
+The first implies
+\begin{equation}
+\begin{aligned}
+e^{-t^2 / 40}
+&\geq \PP_y\{ r(\faty;\fattheta) > 1+t \} \\
+&\geq \PP_y\{ \fattheta^\top \fatpsi(\faty) > \log (Z(\fattheta)(1+t)) \}
+\geq \PP_y\{ \|\fatpsi(\faty)\|_\infty > \log (Z(\fattheta)(1+t)) / \|\fattheta\|_1 \},
+\end{aligned}
+\end{equation}
+and the second,
+\begin{equation}
+\PP_y\{ -\|\fatpsi(\faty)\|_\infty < \log (Z(\fattheta)(1-t)) / \|\fattheta\|_1 \}
+\leq e^{-t^2 / 40}.
+\end{equation}
+Put
+\begin{equation}
+a = \log(Z(\fattheta)(1+t)) / \|\fattheta\|_1 > \frac{\log Z(\fattheta)}{\|\fattheta\|_1}
+\quad\text{and}\quad
+a = \log(Z(\fattheta)(1-t)) / \|\fattheta\|_1 < \frac{\log Z(\fattheta)}{\|\fattheta\|_1}.
+\end{equation}
+Then,
+\begin{equation}
+\PP_y\{ \|\fatpsi(\faty)\|_\infty > t' \}
+\leq \exp\left( -(1 - Z(\fattheta)^{-1} \exp(\|\fattheta\|_1 t'))^2 / 40 \right)
+\end{equation}
+and
+\begin{equation}
+\PP_y\{ -\|\fatpsi(\faty)\|_\infty < t'' \}
+\leq \exp\left( -(1-Z(\fattheta)^{-1} \exp(\|\fattheta\|_1 t''))^2 / 40 \right).
+\end{equation}
+
+\end{proof}
+
+\section{Simulation Study}
+
+We assess the finite sample properties of our proposed procedures by means of simulations in various settings.
+The focus of the first set of experiments is on the performance of our two procedures in de-biasing a single edge of interest when the data are generated from a pair of Ising models.
+
+We tried two different types of graphs for our $\fatx$-graphs: a chain and a $3$-ary tree.
+Each $\fatx$-graph was modified to a $\faty$-graph two different ways.
+For both, $\faty$-graph contains a change of interest and four nuisance changes, two of the same magnitude as the change of interest and two that are twice the size.
+The edge of interest was always fixed at $(5,6)$ for the chain $\fatx$-graphs and at $(1,3)$ for the $3$-ary tree $\fatx$-graphs, but in the case of the $\faty$-graphs marked (1), the pair of larger nuisance changes were placed in the immediate neighborhood of the target edge, whereas in the case of the $\faty$-graphs marked (2), their placement was separated by an edge from the target.
+The two smaller nuisance changes were placed after looking at the Hessian near the estimated change so that it was likely to coincide with the support of $\tilde\fatomega$.
+This gave us four pairs of $\fatx$- and $\faty$-graphs.
+For each pair of graphs, we varied the size of the problem as a function of the number of nodes $m = 25, 50$.
+
+Below is an outline of how a pair of graphs was chosen in somewhat more detail:
+
+\begin{enumerate}[label={\it Step \arabic*.}, wide=0pt]
+
+\item Generate an $\fatx$-graph with $\Unif(-1,1)$ weights.
+
+\item Generate a prototype of $\faty$-graph by placing a change of size $0.2$ on the edge of interest and two changes of size $0.4$
+\begin{enumerate}[label={(\arabic*)}]
+\item among edges in the immediate neighborhood of the target, or
+\item among edges separated by one edge from the target.
+\end{enumerate}
+
+\item Draw a small sample (e.g.~$n_y = 100$), and approximate the support of the immunizing weight vector $\fatomega_{n_y}$.
+
+\item Finalize $\faty$-graph by placing two additional changes of size $0.2$ on coordinates with sufficiently strong signal in $\check\fatomega_{n_y}$
+
+\end{enumerate}
+
+Finally, for each $\fatx$-graph and $\faty$-graph pair, we generated independent samples from the associated Ising models using a Gibbs sampler with burn-in period of $3,000$ and thinning factor of $1,000$.
+For $25$-node graphs --- $p = {{25} \choose 2} = 300$ --- the sample sizes were fixed at $n = 150$ and $n_y = 300$.
+For $50$-node graphs --- $p = {{50} \choose 2} = 1225$ --- we had $n = 300$ and $n_y = 600$.
+
+The reason for the rather complicated model specification process is to maximize the contrast between the estimators constructed with our procedure and those resulting from na\"{i}ve but plausible procedures.
+For these types of problems, there is an obvious benchmark for measuring performance, and that comes from the oracle estimator $\hat\theta_1^\text{oracle}$.
+Here, the oracle procedure is a procedure that sees the true support and solves the $5$-dimensional problem to estimate $\hat\theta_1^\text{oracle}$.
+This is clearly infeasible, and is only used as a comparison.
+
+A feasible but na\"{i}ve procedure first estimates the support of the parameter e.g.~via penalized optimization, and then fits to the estimated support.
+We shall dub such an estimator a na\"{i}ve post-selection estimator, and denote it by $\hat\theta_1^\text{nps}$.
+In spite of the rather demeaning modifier, this estimator is practical in the sense that it does come with some nice theoretical properties, particularly in the case of prediction problems for linear regression.
+
+Using na\"{i}ve post-selection is undesirable in the context of inference, however.
+The reason for this boils down to the fact that there is non-negligible probability that the true support is only partially recovered, and when the sensitivity to the unrecovered components is large enough, even relatively small signals can induce large bias in the resulting estimate.
+To elaborate, let $\check\fattheta$ be some sparse approximation e.g.~the output of the sparse KLIEP.
+If we can somehow guarantee $\supp(\check\fattheta) \supseteq \supp(\fattheta^*)$ with $|\supp(\check\fattheta) \setminus \supp(\fattheta^*)|$ small with probability $1$, we would expect $\hat\theta_1^\text{NPS}$ to be asymptotically normal and unbiased.
+This, of course, is impossible for most practical procedures, and we fail to recover the support with some positive probability.
+If we are lucky, small perturbations in the unselected components tend not to induce large perturbations in the recovered part of the gradient so that the effect of selection mistake is barely noticeable in the final estimate.
+We could be less fortunate, i.e. $\supp(\check\fattheta) \not\subseteq \supp(\fattheta^*)$ but $(\supp(\fattheta^*) \setminus \supp(\check\fattheta)) \cap \supp(\fatomega^*) \neq \varnothing$ and for some $k$ in the set, $\omega_{n_y,k}^*$ is large.
+In this case, we expect the na\"{i}ve post-selection estimator to be biased.
+By contrast, both the double selection estimator and the one-step estimator provides extra protection by utilizing information about $\fatomega_{n_y}^*$.
+
+Table 1 gives the empirical coverage of the confidence intervals constructed using the normal approximation for the na\"{i}ve post-selection (n.p.s.), double selection (d.s.), one-step (one-step), and the oracle estimator.
+Even though we have kept our sample sizes small with $(n_x,n_y) = (150,300)$ for $m = 25$ and $(n_x,n_y) = (300,600)$ for $m = 50$, the estimated coverage rate for our methods are very much on par with the oracle in problems where the na\"{i}ve post-selection is wide of the nominal level of 95\%.
+More detailed results available in Appendix \ref{} indicate that this is largely due to bias, which is anywhere from 2 to 20 times larger than those for our procedures.
+
+
+\begin{table} \caption{Empirical Coverage for Normal Approximation CI} \centering
+\begin{tabular}{c*{4}{|c}*{4}{|r}} \hline\hline
+$\fatx$-graph & $\faty$-graph & $m$ & $n_x$ & $n_y$
+& $\hat\theta_1^\text{nps}$ & $\hat\theta_1^\text{ds}$ & $\hat\theta_1^\text{1step}$ & $\hat\theta_1^\text{oracle}$ \\ \hline\hline
+\multirow{4}{*}{chain}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.882 & 0.952 & 0.952 & 0.952 \\ \cline{3-9}
+& & 50 & 300 & 600 & 0.836 & 0.950 & 0.959 & 0.955 \\ \cline{2-9}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.888 & 0.942 & 0.934 & 0.944 \\ \cline{3-9}
+& & 50 & 300 & 600 & 0.817 & 0.939 & 0.920 & 0.936 \\ \hline
+\multirow{4}{*}{3-ary tree}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.893 & 0.941 & 0.956 & 0.940 \\ \cline{3-9}
+& & 50 & 300 & 600 & 0.865 & 0.956 & 0.963 & 0.945 \\ \cline{2-9}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.919 & 0.941 & 0.963 & 0.951 \\ \cline{3-9}
+& & 50 & 300 & 600 & 0.858 & 0.936 & 0.951 & 0.942 \\ \hline\hline
+\end{tabular}
+\end{table}
+
+\section{Real Data Analysis: US Senate Voting Records}
+
+{\color{red} How does one acknowledge a dataset inherited from other researchers?}
+
+\subsection{Inference on an Edge: Tennessee vs Texas, pre- and post-1994 Election}
+
+One of the largest upsets in the November 1994 US general elections occurred in Tennessee that saw the three-term senator Jim Sasser being replaced by a newcomer Bill Frist.
+Bill Frist went on to serve two terms, four years of which he served as the Senate Majority Leader, before being succeeded by Bob Corker, the current occupant.
+
+Since our dataset contains records from March 25, 1979 to December 30, 2012, the Tennessee seat is one seat that switched party affiliation --- from Democrat to Republican --- after the aforementioned election.
+
+We take January 3, 1995 as the breakpoint to divide our dataset into two samples.
+The 3,993 votes prior to the date is our $\faty$-sample, the remaining 3,956 votes, our $\fatx$-sample.
+Our interest in the relationship to the voting records associated with a traditionally Democratic Hawaii seat, occupied by Daniel Inouye for the entire duration of the dataset.
+Based on the information about party affiliation, we expect the change associated with the edge to be {\it negative}.
+
+The double selection estimate of the difference was found to be $\hat\theta_\text{(TN,HI)} = -0.737$ ($\text{SE} = 0.094$).
+A 95\% CI based on the normal approximation is $(-0.923,-0.554)$.
+A one-sided hypothesis test of $\mathcal{H}_0 : \theta_{\text{(TN,HI)}}^* = 0$ vs $\mathcal{H}_\text{A} : \theta_{\text{(TN,HI)}}^* < 0$ is rejected at $\alpha = .05$.
 
 {
 \bibliographystyle{my-plainnat}
@@ -77,8 +945,1833 @@ University of Chicago Research Computing Center.
 \bibliography{paper}
 }
 
-%\newpage
+\newpage
 
 \appendix
+
+\section{Simulation Study: Detailed Results}
+
+\begin{table} \caption{Regularization Parameter Settings} \centering
+\begin{tabular}{c*{6}{|c}} \hline\hline
+$\fatx$-graph & $\faty$-graph & $m$ & $n_x$ & $n_y$ & $\lambda_1$ & $\lambda_2$ \\ \hline\hline
+\multirow{4}{*}{chain}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.316 & 0.195 \\ \cline{3-7}
+& & 50 & 300 & 600 & 0.219 & 0.154 \\ \cline{2-7}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.316 & 0.195 \\ \cline{3-7}
+& & 50 & 300 & 600 & 0.288 & 0.154 \\ \hline
+\multirow{4}{*}{3-ary tree}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.355 & 0.195 \\ \cline{3-7}
+& & 50 & 300 & 600 & 0.288 & 0.154 \\ \cline{2-7}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.316 & 0.195 \\ \cline{3-7}
+& & 50 & 300 & 600 & 0.209 & 0.154 \\ \hline\hline
+\end{tabular}
+\end{table}
+
+We opted to implement the second step with the scaled lasso to obtain a procedure free of the choice of the regularization parameter.
+In particular, we fixed $\lambda_2$ at the universal penalty level of $\sqrt{2 \log p / n_y}$, which become $\lambda_2 = .276$ for $(m,n_x,n_y) = (25,150,300)$ and $\lambda_2 = .218$ for $(m,n_x,n_y) = (50,300,600)$.
+In our experience, we have found that our procedure is not particularly sensitive to the choice of $\lambda_2$, and displays similar behavior over a reasonably large interval of values.
+
+By contrast, we do not have an autoscaling algorithm for the first step, and we have to take more care in our choice of $\lambda_1$.
+Our strategy is to pick $\lambda_1$ for which the selection is stable in the following sense. {\color{red} HELP!}
+We have found $\lambda_1 = .350$ for $(m,n_x,n_y) = (25,150,300)$, and in the case of $(m,n_x,n_y) = (50,300,600)$, $\lambda_1 = .275$ when $\fatx$-graph is a chain $\lambda_1 = .225$ when it is a triary tree to work well.
+
+
+\begin{table} \caption{Empirical Coverage for Normal Approximation CI} \centering
+\begin{tabular}{c*{4}{|c}*{5}{|r}} \hline\hline
+$\fatx$-graph & $\faty$-graph & $m$ & $n_x$ & $n_y$
+& \multicolumn{1}{c}{n.p.s.} & \multicolumn{1}{|c}{n.i.s.} & \multicolumn{1}{|c}{d.s.} & \multicolumn{1}{|c}{one-step} & \multicolumn{1}{|c}{oracle} \\ \hline\hline
+\multirow{4}{*}{chain}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.882 & 0.962 & 0.952 & 0.952 & 0.952 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.836 & 0.950 & 0.950 & 0.959 & 0.955 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.888 & 0.964 & 0.942 & 0.934 & 0.944 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.817 & 0.948 & 0.939 & 0.920 & 0.936 \\ \hline
+\multirow{4}{*}{3-ary tree}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.893 & 0.967 & 0.941 & 0.956 & 0.940 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.865 & 0.974 & 0.956 & 0.963 & 0.945 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.919 & 0.970 & 0.941 & 0.963 & 0.951 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.858 & 0.974 & 0.936 & 0.951 & 0.942 \\ \hline\hline
+\end{tabular}
+\end{table}
+\begin{table} \caption{Empirical Bias} \centering
+\begin{tabular}{c*{4}{|c}*{5}{|r}} \hline\hline
+$\fatx$-graph & $\faty$-graph & $m$ & $n_x$ & $n_y$
+& \multicolumn{1}{c}{n.p.s.} & \multicolumn{1}{|c}{n.i.s.} & \multicolumn{1}{|c}{d.s.} & \multicolumn{1}{|c}{one-step} & \multicolumn{1}{|c}{oracle} \\ \hline\hline
+\multirow{4}{*}{chain}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.07011 & 0.01754 & -0.01428 & -0.01585 & -0.00396 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.06979 & 0.02684 & -0.01388 & -0.01469 & 0.00096 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.06662 & -0.00443 & -0.01035 & -0.01144 & -0.00452 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.07000 & -0.00162 & -0.00614 & -0.00814 & -0.00330 \\ \hline
+\multirow{4}{*}{3-ary tree}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.07709 & -0.01600 & -0.02348 & -0.00968 & -0.00118 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.07368 & 0.00286 & -0.01197 & -0.00025 & -0.00936 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.06455 & 0.00583 & 0.00225 & 0.00793 & 0.00252 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.08234 & -0.00405 & -0.00858 & -0.00458 & -0.00487\\ \hline\hline
+\end{tabular}
+\end{table}
+\begin{table} \caption{Empirical RMSE} \centering
+\begin{tabular}{c*{4}{|c}*{5}{|r}} \hline\hline
+$\fatx$-graph & $\faty$-graph & $m$ & $n_x$ & $n_y$
+& \multicolumn{1}{c}{n.p.s.} & \multicolumn{1}{|c}{n.i.s.} & \multicolumn{1}{|c}{d.s.} & \multicolumn{1}{|c}{one-step} & \multicolumn{1}{|c}{oracle} \\ \hline\hline
+\multirow{4}{*}{chain}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.13576 & 0.12326 & 0.12639 & 0.12736 & 0.11679 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.10940 & 0.08956 & 0.08857 & 0.08909 & 0.08128 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.12668 & 0.11303 & 0.12735 & 0.12820 & 0.12438 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.10307 & 0.08058 & 0.08793 & 0.08907 & 0.08686 \\ \hline
+\multirow{4}{*}{3-ary tree}
+& \multirow{2}{*}{(1)} & 25 & 150 & 300 & 0.16247 & 0.18494 & 0.20241 & 0.20209 & 0.17889 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.12343 & 0.12535 & 0.13804 & 0.13911 & 0.12487 \\ \cline{2-10}
+& \multirow{2}{*}{(2)} & 25 & 150 & 300 & 0.15754 & 0.18787 & 0.20420 & 0.21813 & 0.17834 \\ \cline{3-10}
+& & 50 & 300 & 600 & 0.13936 & 0.13474 & 0.15300 & 0.15819 & 0.12573 \\ \hline\hline
+\end{tabular}
+\end{table}
+
+\begin{algorithm}[t] \caption{Na\"{i}ve Immunized Selection} \label{algo:NIS}
+\begin{enumerate}[label={\it Step \arabic*.}, wide=0pt]
+\item Compute an initial estimate $\check\fattheta$:
+\[
+\check\fattheta
+\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta; X, Y) + \lambda_1 \|\fattheta\|_1.
+\]
+\item Compute a sparse approximation $\check\fatomega$ to the row of the inverse of the Hessian corresponding to the parameter of interest:
+\[
+\check\fatomega
+\leftarrow \argmin_{\fatomega} \tfrac{1}{2}\fatomega^\top\Hb\ell_\text{KLIEP}(\check\fattheta; Y)\fatomega - \langle \fate_1,\fatomega \rangle + \lambda_2 \|\fatomega\|_1.
+\]
+\item Re-estimate on the estimated support $\supp(\check\fatomega)$:
+\[\delta\tilde\fattheta^\text{NIS}
+\leftarrow \argmin_{\fattheta} \ell_\text{KLIEP}(\fattheta; X,Y) : \supp(\fattheta) \subseteq \supp(\check\fatomega).
+\]
+\item Obtain
+\[
+\tilde\theta_1^\text{NIS} \leftarrow \langle \fate_1,\delta\tilde\fattheta^\text{NIS} \rangle.
+\]
+\end{enumerate}
+\end{algorithm}
+
+A pair of graph generated in this way is expected to perform poorly with na\"{i}ve post-selection but not with double selection.
+It is somewhat more tricky to construct a pair from a general exponential family for which na\"{i}ve immunization is expected to fail but double selection is expected to succeed, but one of our tree graph pairs --- namely, the one obtained via (1) --- does display this property.
+
+In the ideal scenario that $\fattheta^*$ (respectively, $\fatomega^*$) is exactly sparse and the estimation procedure recovers the support with probability approaching $1$ as sample size approaches infinity, the naive post-selection estimator $\tilde\theta_1^\text{NPS}$ (respectively, the naive immunized selection estimator $\tilde\theta_1^\text{NIS}$) is expected to perform as well as the oracle.
+It is well-known, however, that the conditions for support recovery require extra assumptions that needs to be verified.
+Moreover, for the particular problem of de-biasing a KLIEP estimate, it is unlikely that $\fatomega_{n_y}^*$ is ever exactly sparse based on our empirical experience.
+
+By contrast, the vector $\delta\tilde\fattheta^\text{NIS}$, from which the na\"{i}ve immunized selection estimator $\tilde\theta_1^\text{NIS}$ is derived, is, in general, not a good estimator of $\fattheta^*$.
+But by including the coordinates that have non-negligible second-order relations with the parameter of interest, the procedure can remove bias due to second-order perturbations at least when $\supp(\check\fatomega) \supseteq \supp(\fatomega^*)$ with $|\supp(\check\fatomega) \setminus \supp(\fatomega^*)|$ small.
+In that case, $\tilde\theta_1^\text{NIS}$ is a valid estimator for approximation by normal inference.
+{\color{red} (I can give a simple heuristic argument based on an approximate Taylor expansion by partitioning the parameter vector into three components. Should I provide one?)}
+Also, although the na\"{i}ve immunized selection estimator appears to outperform our estimator in some scenarios, when it fails as for chain (1), its performance metrics are closer to those of the na\"{i}ve post-selection estimator than those of the double selection estimator.
+The main advantage that our estimator has over the na\"{i}ve alternatives is that its behavior is stable across a wide range of simulation set-ups.
+
+Our proposed method is a variant of double selection, which is known to be robust to mild failures of either scenario.
+In the case of the na\"{i}ve post-selection estimator $\theta_1^\text{NPS}$, if $\supp(\check\fattheta) \not\subseteq \supp(\fattheta^*)$ but $(\supp(\fattheta^*) \setminus \supp(\check\fattheta)) \cap \supp(\fatomega^*) \neq \varnothing$ and for some $k$ in the set, $\omega_k^*$ is sufficiently large, then $\theta_1^\text{NPS}$ will be biased.
+For the differential network, this can happen when the difference graph has a weak edge with a large true immunizing weight.
+In the case of the na\"{i}ve immunized selection estimator $\theta_1^\text{NIS}$, if $\supp(\check\fatomega) \not\subseteq \supp(\fattheta^*)$ but $(\supp(\fatomega^*) \setminus \supp(\check\fatomega)) \cap \supp(\fattheta^*) \neq \varnothing$ and for some $k$ in the set, $\fattheta_k^*$ is sufficiently large, then $\theta_1^\text{NIS}$ will be biased.
+This may happen when a coordinate with a true weak immunizing weight coincides with a strong edge.
+
+Indeed, the lack of scenarios that are adversarial to the na\"{i}ve immunized selection estimator is arguably a mere artifact of the difficulty of constructing such a problem by hand.
+This is because the relationship between the structure of the graph and the inverse of the covariance matrix that exists for the Gaussian random variables is somewhat lost in the non-Gaussian case.
+For our problem, there are additional layers of complexity caused by trying to approximate $\fatpsi(\fatx)$-covariance with $\faty$-samples at the estimate $\check\fattheta$ rather than at the truth $\fattheta^*$.
+Thus, predicting the sparsity structure of $\fatomega_{n_y}^*$ is no longer so simple, and this makes designing problems for which the na\"{i}ve immunized-selection estimator is guaranteed to do poorly at the very least cumbersome.
+But as illustrated by chain (1), such scenarios do exist, especially if the immediate neighborhood of the target edge has a fair number of edges in the difference graph with mixed signal strength.
+
+\section{Notations}
+Put
+\begin{align*}
+\hat\Hb_{n_y}(\fattheta) &:= \nabla^2 \ell_\text{KLIEP}(\fattheta), &
+\Hb_{n_y}(\fattheta) &:= \frac{\hat Z^2(\fattheta)}{Z^2(\fattheta)} \hat\Hb_{n_y}(\fattheta),
+\end{align*}
+i.e.
+\begin{equation}
+\Hb_{n_y}(\fattheta)= \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right) \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')} \right)^\top r(\faty^{(j)};\fattheta) r(\faty^{(j')};\fattheta).
+\end{equation}
+Also, let
+\begin{align*}
+\hat\Ib_{n_y}(\fattheta) &:= \EE_y[ \hat\Hb_{n_y}(\fattheta) ] = \EE_y[ \nabla^2 \ell_\text{KLIEP}(\fattheta) ], &
+\Ib_{n_y}(\fattheta) &:= \EE_y[ \Hb_{n_y}(\fattheta) ] = \EE_y\left[ \frac{\hat Z^2(\fattheta)}{Z^2(\fattheta)} \hat\Hb_{n_y}(\fattheta) \right].
+\end{align*}
+
+\section{Proof of Theorem \ref{thm:main}}
+
+\begin{thm} \label{thm:main}
+Suppose Conditions \ref{hyp:invertibility} and \ref{hyp:sparsity} hold, and assume a bounded density ratio model.
+
+\begin{equation}
+n_y \geq (C_{n_y} s \log p) \log^3 (C_{n_y} s \log p),
+\end{equation}
+for some constant $C_{n_y} > 0$, then either the double selection estimator or the one-step estimator satisfies
+\begin{equation}
+\sqrt{n} \, \sigma_{n_y}^{-1} (\hat\theta_1 - \theta_1^*) \xrightarrow{\mathscr{L}} \Ncal(0,1),
+\end{equation}
+where
+\begin{equation}
+\sigma_{n_y}^2 = \Var_x\left[ \langle \fatomega_{n_y}^*, \fatpsi(\fatx) - \fatmu \rangle \right].
+\end{equation}
+\end{thm}
+
+\begin{proof}
+\begin{equation} \label{eq:lin_rep}
+\begin{aligned}
+\sqrt{n} \, \sigma^{-1} (\hat\theta_1 - \theta_1^*)
+=
+&-\underbrace{\sqrt{n} \, \sigma^{-1} \langle \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle}_\text{(A)} \\
+&-\underbrace{\sqrt{n} \, \sigma^{-1} \langle \tilde\fatomega - \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\tilde\fattheta) \rangle}_\text{(B)}
+-\underbrace{\sqrt{n} \, \sigma^{-1} \langle \bar\Hb \fatomega_{n_y}^* - \fate_1, \tilde\fattheta - \fattheta^* \rangle}_\text{(C)},
+\end{aligned}
+\end{equation}
+When $\hat\theta_1$ is the double selection estimator, $\hat\theta_1$ satisfies (\ref{eq:lin_rep}) where
+where $\tilde\fattheta$ and $\tilde\fatomega$ are the final re-fitted estimators in Algorithm \ref{algo:2selection}.
+When $\hat\theta_1$ is the one-step estimator, $\tilde\fattheta$ and $\tilde\fatomega$ are the initial estimators e.g.~the solutions to the two LASSO-type problems in Algorithm \ref{algo:1step}.
+
+For large values of $n$ and $n_y$, (A) is approximately normally distributed by Lemma \ref{lem:Berry_Esseen_CLT}.
+It then remains to show that (B) and (C) are negligible for either choices of the pair ($\tilde\fattheta,\tilde\fatomega)$ given the conditions of the theorem.
+
+We start with (B).
+Expand (B) as
+\begin{multline}
+\text{(B)}
+= \underbrace{\sqrt{n} \sigma^{-1} \langle \tilde\fatomega - \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle}_\text{(B1)} \\
++ \underbrace{\sqrt{n} \sigma^{-1} \langle \tilde\fatomega - \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\tilde\fattheta) - \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle}_\text{(B2)}.
+\end{multline}
+For (B1), by Cauchy-Schwarz,
+\begin{multline}
+|\text{(B1)}|
+\leq \sqrt{n} \sigma^{-1} \|\tilde\fatomega - \fatomega_{n_y}^*\|_1 \|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \\
+= \sqrt{n} \, O_{\PP}\left( \sqrt{\frac{s_2^3 \log p}{n}} \right) O_{\PP}\left( \sqrt{\frac{\log p}{n}} \right)
+= O_{\PP}\left( \frac{s_2^{3/2} \log p}{\sqrt{n}} \right),
+\end{multline}
+where the last line combines Lemma \ref{lem:consistency2} and Lemma \ref{lem:grad1}.
+For (B2), because
+\begin{equation}
+\nabla \ell_\text{KLIEP}(\tilde\fattheta) - \nabla \ell_\text{KLIEP}(\fattheta^*)
+= \int_0^1 \nabla^2 \ell_\text{KLIEP}(\fattheta^* + t(\tilde\fattheta - \fattheta^*)) (\tilde\fattheta - \fattheta^*) \, dt,
+\end{equation}
+we have
+\begin{equation}
+\begin{aligned}
+|\text{(B2)}|
+&\leq \sqrt{n} \sigma^{-1} \int_0^1 \left| \left\langle \tilde\fatomega - \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^* + t(\tilde\fattheta - \fattheta^*)) (\tilde\fattheta - \fattheta^*) \right\rangle \right| \, dt \\
+&\leq \sqrt{n} \sigma^{-1} M_{\nabla^2 \ell} \|\tilde\fatomega - \fatomega_{n_y}^*\|_1 \|\tilde\fattheta - \fattheta^*\|_1 \\
+&= \sqrt{n} \, O_{\PP}\left( \sqrt{\frac{s_2^3 \log p}{n}} \right) O_{\PP}\left( \sqrt{\frac{s_1^2 \log p}{n}} \right)
+= O_{\PP}\left( \frac{s_1 s_2^{3/2} \log p}{\sqrt{n}} \right),
+\end{aligned}
+\end{equation}
+first by Proposition \ref{prop:Hessian_max_norm_bd}, and then by Lemma \ref{lem:consistency1} and Lemma \ref{lem:consistency2}.
+Thus,
+\begin{equation}
+|\text{(B)}|
+= O_{\PP}\left( \frac{s_2^{3/2} \log p}{\sqrt{n}} \right) + O_{\PP}\left( \frac{s_1 s_2^{3/2} \log p}{\sqrt{n}} \right)
+= O_{\PP}\left( \frac{s_1 s_2^{3/2} \log p}{\sqrt{n}} \right).
+\end{equation}
+
+We turn to (C).
+By Cauchy-Schwarz,
+\begin{equation}
+|\sqrt{n} \sigma^{-1} \langle \bar\Hb \fatomega_{n_y}^* - \fate_1, \tilde\fattheta - \fattheta^* \rangle|
+\leq \sqrt{n} \sigma^{-1} \|\bar\Hb \fatomega_{n_y}^* - \fate_1\|_\infty \|\tilde\fattheta - \fattheta^*\|_1.
+\end{equation}
+Now,
+\begin{equation}
+\begin{aligned}
+\|\bar\Hb \fatomega_{n_y}^* &- \fate_1\|_\infty \\
+&= \left\| \left[ \int_0^1 \hat\Hb(\fattheta^* + t (\tilde\fattheta - \fattheta^*)) \, dt - \hat\Ib(\fattheta^*) \right] \fatomega_{n_y}^* \right\|_\infty \\
+&\leq \left\| \left[ \int_0^1 \hat\Hb(\fattheta^* + t (\tilde\fattheta - \fattheta^*)) \, dt - \hat\Hb(\fattheta^*) \right] \fatomega_{n_y}^* \right\|_\infty + \|[ \hat\Hb(\fattheta^*) - \hat\Ib(\fattheta^*) ] \fatomega_{n_y}^*\|_\infty \\
+&\leq \underbrace{\int_0^1 \|[ \hat\Hb(\fattheta^* + t (\tilde\fattheta - \fattheta^*)) - \hat\Hb(\fattheta^*) ] \fatomega_{n_y}^*\|_\infty \, dt}_\text{(C1)} + \underbrace{\|[ \hat\Hb(\fattheta^*) - \hat\Ib(\fattheta^*) ] \fatomega_{n_y}^*\|_\infty}_\text{(C2)}.
+\end{aligned}
+\end{equation}
+First by Lemma \ref{lem:perturbation_bound} and then by Lemma \ref{lem:consistency1},
+\begin{equation}
+\begin{aligned}
+\text{(C1)}
+&\leq \int_0^1 \frac{8M_\psi^3 M_r^3}{m_r^3} \|\tilde\fattheta - \fattheta^*\|_1 \|\fatomega_{n_y}^*\|_1 \, t \, dt \\
+&= \frac{4M_\psi^3 M_r^3}{m_r^3} \|\tilde\fattheta - \fattheta^*\|_1\|\fatomega_{n_y}^*\|_1 \\
+&= O_{\PP}\left( \sqrt{\frac{s_1^2 \log p}{n}} \right) O\left( \sqrt{s_2} \right)
+= O_{\PP}\left( \sqrt{\frac{s_1^2 s_2 \log p}{n}} \right).
+\end{aligned}
+\end{equation}
+By Lemma \ref{lem:Chernoff_bound},
+\begin{equation}
+\text{(C2)} = O_{\PP}\left( \frac{\sqrt{s_2} \log p}{n_y} \right).
+\end{equation}
+Thus,
+\begin{multline}
+|\text{(C)}|
+= \sqrt{n} \, \left( O_{\PP}\left( \sqrt{\frac{s_1^2 s_2 \log p}{n}} \right) + O_{\PP}\left( \frac{\sqrt{s_2} \log p}{n_y} \right) \right) O_{\PP}\left( \sqrt{\frac{s_1^2 \log p}{n}} \right) \\
+= O_{\PP}\left( \frac{s_1^2 \sqrt{s_2} \log p}{\sqrt{n}} \right).
+\end{multline}
+
+Returning to (\ref{eq:approx_ds_Taylor}),
+\begin{equation}
+\begin{aligned}
+\sqrt{n} \sigma^{-1} (\hat\theta_1 - \theta_1^*)
+&= \text{(A)} + \text{(B)} + \text{(C)} \\
+&= \Ncal(0,1) + O\left( \sqrt{\frac{s_2}{n^\alpha}} \right) + O_{\PP}\left( \frac{s_1 s_2^{3/2} \log p}{\sqrt{n}} \right) + O_{\PP}\left( \frac{s_1^2 \sqrt{s_2} \log p}{\sqrt{n}} \right) \\
+&= \Ncal(0,1) + O_{\PP}\left( \frac{s^{5/2} \log p}{\sqrt{n}} \right).
+\end{aligned}
+\end{equation}
+By assumption, $s^{5/2} \log p / \sqrt{n} \to 0$ as $n \to \infty$, and we have our result.
+\end{proof}
+
+\section{Proofs of Propositions for the Bounded Case} \label{sec:bdd_pfs}
+
+\begin{prop}
+\begin{equation}
+\|\fatpsi(\faty)\|_\infty = \max_k |\psi_k(\faty_k)| \leq M_\psi \quad \text{a.s.} \quad \text{for some}\quad M_\psi < \infty.
+\end{equation}
+implies Assumption \ref{hyp:bdd_den_ratio}.
+Moreover, if Assumption \ref{hyp:bdd_den_ratio} is satisfied with $\mathcal{U}(\fattheta^*)$ that also contains $\mathbf{0}$, then $\|\fatpsi(\faty)\|_\infty$ is bounded.
+\end{prop}
+
+\begin{proof}
+Assume $\|\fatpsi(\faty)\|_\infty \leq M_\psi$ a.s.~for some $M_\psi < \infty$.
+Let $\mathcal{U}(\fattheta^*)$ be a bounded neighborhood of $\fattheta^*$.
+For some $R < \infty$, $\|\fattheta - \fattheta^*\|_1 \leq R$ for all $\fattheta \in \mathcal{U}(\fattheta^*)$, and by Cauchy-Schwarz,
+\begin{equation}
+|\fatpsi(\faty)^\top \fattheta| 
+\leq \|\fatpsi(\faty)\|_\infty \|\fattheta\|_1
+\leq \|\fatpsi(\faty)\|_\infty (\|\fattheta - \fattheta^*\|_1 + \|\fattheta^*\|_1)
+\leq M_\psi(R + \|\fattheta^*\|_1).
+\end{equation}
+Thus,
+\begin{equation}
+\exp(-M_\psi(R + \|\fattheta^*\|_1)
+\leq \exp\left( \fatpsi(\faty)^\top \fattheta \right) 
+\leq \exp(M_\psi(R + \|\fattheta^*\|_1),
+\end{equation}
+and
+\begin{equation}
+\exp(-2M_\psi(R + \|\fattheta^*\|_1) \leq r(\faty;\fattheta)
+\leq \exp(2M_\psi(R + \|\fattheta^*\|_1).
+\end{equation}
+In particular, one may choose $m_r = \exp(-2M_\psi(R + \|\fattheta^*\|_1))$ and $M_r = \exp(2M_\psi(R + \|\fattheta^*\|_1))$.
+This proves the first claim.
+
+For the second claim, we prove its contrapositive, i.e.~if $\psi_k(\faty_k)$ is unbounded for some $k$, then for any bounded neighborhood $\mathcal{U}(\fattheta^*)$ that also contains $\mathbf{0}$, there exists $\fattheta \in \mathcal{U}(\fattheta^*)$ such that the ratio $r(\faty;\fattheta)$ is not bounded a.s.
+
+Fix an arbitrary $\mathcal{U}(\fattheta^*)$.
+By openness of $\mathcal{U}(\fattheta^*)$, there exists $r > 0$ such that the closed ball of radius $r$ centered at $\mathbf{0}$ is contained in $\mathcal{U}(\fattheta^*)$.
+Suppose $\psi_{k'}(\faty_{k'})$ is unbounded.
+This means that for any $M > 0$,
+\begin{equation}
+\PP_y\{ \psi_{k'}(\faty_{k'}) \geq M/r \} > 0.
+\end{equation}
+Now, on this event, if $\fattheta^+ = r\fate_{k'}$, then $\fatpsi(\faty)^\top \fattheta^+ = r\psi_{k'}(\faty_{k'}) \geq M$, and if $\fattheta^- = -r\fate_{k'}$, then $\fatpsi(\faty)^\top \fattheta^- = \fatpsi(\faty)^\top \fattheta^* - r\psi_{k'}(\faty_{k'}) \leq -M$.
+Thus, the ratio cannot be bounded a.s.
+\end{proof}
+
+We remark that the bounds derived from the Cauchy-Schwarz are not tight.
+
+\begin{prop}
+If Assumption \ref{hyp:bdd_den_ratio} holds, then there exist $M_{\nabla^2 \ell} < \infty$ such that
+\begin{equation}
+\|\nabla^2 \ell_\text{KLIEP}(\fattheta)\|_\infty
+= \max_{k,\ell} |\fate_k^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fate_\ell|
+\leq M_{\nabla^2} \quad \text{whenever} \quad \fattheta \in \mathcal{U}(\fattheta^*).
+\end{equation}
+\end{prop}
+
+\begin{proof}
+The Hessian evaluated at $\fattheta$ is
+\begin{equation}
+\nabla^2 \ell_\text{KLIEP}(\fattheta)
+= \frac{1}{n_y^2}\sum_{1\leq j<j'\leq n_y} \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right) \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right)^\top \hat r(\faty^{(j)};\fattheta) \, \hat r(\faty^{(j')};\fattheta).
+\end{equation}
+Let $(k,\ell)$ be an edge pair.
+Then,
+\begin{equation}
+\begin{aligned}
+\fate_k^\top & \nabla^2 \ell_\text{KLIEP}(\fattheta) \fate_\ell \\
+&= \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right) \left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \\
+&\leq \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} 4 M_\psi^2 M_r^2 / m_r^2 \\
+&\leq 4 M_\psi^2 M_r^2 / m_r^2,
+\end{aligned}
+\end{equation}
+for $\fattheta \in \mathcal{U}(\fattheta^*)$.
+\end{proof}
+
+Let $\Sbb_{\psi(y)}$ be the ``sample" covariance, i.e.
+\begin{equation}
+\Sbb_{\psi(y)}
+:= \frac{1}{n_y} \sum_{j=1}^{n_y} \left( \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right) \left( \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right)^\top.
+\end{equation}
+We apply Theorem 8 in (Rudelson and Zhao, 2013) to derive an RE condition for $\Sbb_{\psi(y)}$ from Assumptions \ref{hyp:RE} and \ref{hyp:min_sparse_eigval}.
+
+\begin{lem}[Application of Theorem 8 in Rudelson and Zhao, 2013] \label{lem:RE_sample}
+Suppose Assumptions \ref{hyp:RE} and \ref{hyp:min_sparse_eigval} hold.
+Suppose, in addition, the $\faty$-sample size requirement is satisfied:
+\begin{equation}
+n_y \geq (C_{n_y} s \log p) \log^3 (C_{n_y} s \log p),
+\end{equation}
+where $C_{n_y} > 0$ is a constant.
+Then,
+\begin{equation}
+\min_{\substack{S \subseteq [p] \\ |S| \leq s}} \min_{\substack{\fatv \neq \mathbf{0} \\ \|\fatv_{S^c}\|_1 \leq 3\|\fatv_S\|_1}} \frac{\fatv^\top \Sbb_{\psi(y)} \fatv}{\|\fatv_S\|_2^2}
+= \frac{\kappa^*}{4}
+> 0
+\end{equation}
+with probability at least $1 - \exp(-C_{S_\psi(y)} n_y / s)$, where $C_{S_\psi(y)} > 0$ is a constant.
+The two constants depend only on $M_\psi$, $\kappa^*$, $\rho_d^*$, and $\bar\sigma_{\psi(y)}^2$.
+\end{lem}
+
+\begin{proof}
+Apply Theorem 8 in (Rudelson and Zhao, 2013) with $Y = \fatpsi(\faty) - \fatmu_{\psi(y)}$, $\Sigma = \fatSigma_{\psi(y)}$, $s_0 = s$, $k_0 = 3$, and $\delta = 1/2$.
+Note that our $\kappa^*$ is equal to $1 / K^2(s_0,3k_0,\Sigma^{1/2}) = 1 / K^2(s,9,\Sigma_{\psi(y)}^{1/2})$ in their notation.
+Also, the constants are
+\begin{equation}
+C_{n_y} = \frac{4C M_\psi^2}{\rho_d^*} \left( 1 + \frac{C_d \bar\sigma_{\psi(y)}^2}{\kappa^*} \right)
+\quad\text{and}\quad
+C_{S_\psi(y)} = \frac{\kappa^* \rho_d^*}{12 M_\psi^2 (\kappa^* + C_d \bar\sigma_{\psi(y)}^2)},
+\end{equation}
+where $C > 0$ is an absolute constant from (Rudelson and Zhao, 2013).
+\end{proof}
+
+We proceed to establish the restricted strong convexity condition for $\nabla^2 \ell_\text{KLIEP}(\fattheta)$.
+To do so, write $\nabla^2 \ell_\text{KLIEP}(\fattheta)$ as a difference of $\hat\Hb_1(\fattheta)$ and $\hat\Hb_2(\fattheta)$, where
+\begin{equation}
+\begin{aligned}
+\nabla^2 \ell_\text{KLIEP}(\fattheta)
+&= \frac{1}{n_y} \fatPsi(\mathcal{Y}) \left[ \diag(\hat\fatr(\mathcal{Y};\fattheta)) - \frac{1}{n_y} \hat\fatr(\mathcal{Y};\fattheta) \hat\fatr(\mathcal{Y};\fattheta)^\top \right] \fatPsi(\mathcal{Y})^\top \\
+&= \underbrace{\frac{1}{n_y} \left[ \fatPsi(\mathcal{Y}) - \fatmu_{\psi(y)} \mathbf{1}^\top \right] \diag(\hat\fatr(\mathcal{Y};\fattheta)) \left[ \fatPsi(\mathcal{Y}) - \fatmu_{\psi(y)} \mathbf{1}^\top \right]^\top}_{\hat\Hb_1(\fattheta)} \\
+&\qquad\qquad\qquad\qquad - \underbrace{\left( \frac{1}{n_y} \fatPsi(\mathcal{Y}) \hat\fatr(\mathcal{Y};\fattheta) - \fatmu_{\psi(y)} \right)\left( \frac{1}{n_y} \fatPsi(\mathcal{Y}) \hat\fatr(\mathcal{Y};\fattheta) - \fatmu_{\psi(y)} \right)^\top}_{\hat\Hb_2(\fattheta)}.
+\end{aligned}
+\end{equation}
+
+\begin{lem} \label{lem:Hhat1}
+Let $\fatv^* \in \RR^p$ and $S \subseteq [p]$ with $|S| \leq s$.
+Suppose, in addition, the $\faty$-sample size requirement is satisfied:
+\begin{equation}
+n_y \geq (C_{n_y} s \log p) \log^3 (C_{n_y} s \log p),
+\end{equation}
+where $C_{n_y} > 0$ is a constant.
+Then, for each $\fattheta \in \mathcal{U}(\fattheta^*)$, for all $\fatv \in \mathcal{E}(S;\fatv^*)$
+\begin{enumerate}
+\item if $\supp(\fatv^*) \subseteq S$,
+\begin{equation}
+\fatv^\top \hat\Hb_1(\fattheta) \fatv
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2,
+\end{equation}
+\item if $\supp(\fatv^*) \not\subseteq S$,
+\begin{equation}
+\fatv^\top \hat\Hb_1(\fattheta) \fatv
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2 - \left( \frac{3\kappa^* m_r}{4 M_r} \frac{1}{\sqrt{s}} + \frac{128 M_\psi^2 M_r}{m_r} \sqrt{s} \right) \|\fatv_{S^c}^*\|_1 \|\fatv\|,
+\end{equation}
+\end{enumerate}
+with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s)$.
+\end{lem}
+
+\begin{proof}
+We start with an observation.
+For any $\fatv \in \RR^p$, if $T$ is the set of indices of the $s$ largest components of $\fatv$ in magnitude, then for any $k' \notin T$, $|v_{k'}| \leq |v_k|$ for all $k \in T$, and so $s |v_{k'}| \leq \|\fatv_T\|_1$.
+Thus, $s \|\fatv_{T'}\|_\infty \leq \|\fatv_T\|_1$ for any $T' \subseteq T^c$.
+
+Let us turn to the proof of the statement.
+In the first case, we have $\supp(\fatv^*) \subseteq S$, so that $\|\fatv_{T^c}\|_1 \leq 3\|\fatv_T\|_1$ for all $\fatv \in \mathcal{E}(S;\fatv^*)$ by definition, and
+\begin{equation}
+\fatv^\top \Sbb_{\psi(y)} \fatv \geq \frac{\kappa^*}{4} \|\fatv_T\|^2
+\end{equation}
+by Lemma \ref{lem:RE_sample}.
+But
+\begin{equation}
+\|\fatv_{T^c}\|^2
+\leq \|\fatv_{T^c}\|_1 \|\fatv_{T^c}\|_\infty
+\leq 3\|\fatv_T\|_1 \cdot \|\fatv_T\|_1 / s
+\leq 3\|\fatv_T\|^2,
+\end{equation}
+so that
+\begin{equation}
+\|\fatv\|^2 = \|\fatv_T\|^2 + \|\fatv_{T^c}\|^2 \leq 4\|\fatv_T\|^2,
+\end{equation}
+and consequently,
+\begin{equation}
+\fatv^\top \Sbb_{\psi(y)} \fatv \geq \frac{\kappa^*}{16} \|\fatv\|^2.
+\end{equation}
+Under Assumption \ref{hyp:bdd_den_ratio}, $\hat r(\faty;\fattheta) \geq m_r / M_r > 0$, so that
+\begin{multline}
+\fatv^\top \hat\Hb_1(\fattheta) \fatv
+= \frac{1}{n_y} \sum_{j=1}^{n_y} \left\langle \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)}, \fatv \right\rangle^2 \hat r(\faty^{(j)};\fattheta) \\
+\geq \frac{m_r/M_r}{n_y} \sum_{j=1}^{n_y} \left\langle \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)}, \fatv \right\rangle^2
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2.
+\end{multline}
+
+For the second case, given $\fatv \in \mathcal{E}(S;\fatv^*)$, either $\|\fatv_{T^c}\|_1 \leq 3\|\fatv_T\|_1$ or $\|\fatv_{T^c}\|_1 > 3\|\fatv_T\|_1$.
+The former really falls under the first case, so we assume the latter.
+Consider a complete ordering of the components of $\fatv$ by magnitude:
+\begin{equation}
+\underbrace{|v_{(1)}| \geq \dots \geq |v_{(s)}|}_{T} \geq \underbrace{|v_{(s+1)}| \geq \dots \geq |v_{(p)}|}_{T^c}.
+\end{equation}
+Let $s'$ be the smallest integer such that the sum over the $(s+1)$-st largest to the $s'$-th largest components is greater than or equal to $3\|\fatv_T\|_1$, i.e.~$s'$ satisfies
+\begin{equation}
+\sum_{k=s+1}^{s'-1} |v_{(k)}| < 3\|\fatv_T\|_1
+\quad\text{and}\quad
+\sum_{k=s+1}^{s'} |v_{(k)}| \geq 3\|\fatv_T\|_1.
+\end{equation}
+Let $T'$ be the set of indices of the $(s+1)$-st largest to the $(s'-1)$-st largest components by magnitude, $k'$ the index corresponding to the $s'$-th largest, and $T''$ the remainder.
+In other words, we partition $[p]$ according to
+\begin{equation}
+\underbrace{|v_{(1)}| \geq \dots \geq |v_{(s)}|}_{T} \geq \underbrace{|v_{(s+1)}| \geq \dots \geq |v_{(s'-1)}|}_{T'} \geq \underbrace{|v_{(s')}|}_{k'} \geq \underbrace{|v_{(s'+1)}| \geq \dots \geq |v_{(p)}|}_{T''}.
+\end{equation}
+Define $\fatw$ by
+\begin{equation}
+w_k
+=
+\begin{cases}
+v_k & \text{ for } k \in T \cup T', \\
+\sgn(v_k) (3\|\fatv_T\|_1 - \|\fatv_{T'}\|_1) & \text{ for } k = k', \\
+0 & \text{ for } k \in T''.
+\end{cases}
+\end{equation}
+and $\fatr = \fatv - \fatw$ as the remainder.
+We may write
+\begin{equation}
+\begin{aligned}
+\fatv^\top \hat\Hb_1(\fattheta) \fatv
+&= (\fatw + \fatr)^\top \hat\Hb_1(\fattheta) (\fatw + \fatr) \\
+&= \fatw^\top \hat\Hb_1(\fattheta) \fatw + 2\fatw^\top \hat\Hb_1(\fattheta) \fatr + \fatr^\top \hat\Hb_1(\fattheta) \fatr
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatw\|^2 - 2 \|\hat\Hb_1(\fattheta)\|_\infty \|\fatw\|_1 \|\fatr\|_1.
+\end{aligned}
+\end{equation}
+The last line uses the result for the previous case, because $\|\fatw_{T^c}\|_1 = 3\|\fatw_T\|_1$ by construction.
+It remains to bound $\|\fatw\|^2$ and $\|\fatw\|_1 \|\fatr\|_1$ by some functions of $\fatv$ only.
+We treat the first term first.
+Note that $\fatw$ and $\fatr$ can have at most one overlapping support in $k'$, so that
+\begin{equation}
+\|\fatv\|^2 = \|\fatw\|^2 + \|\fatr\|^2 + 2 w_{k'} r_{k'}.
+\end{equation}
+By construction, $w_{k'}$ and $r_{k'}$ share the same sign, and so $\|\fatv_{T^c}\|_1 = \|\fatw_{T^c}\|_1 + \|\fatr\|_1$.
+As $\|\fatw_{T^c}\|_1 = 3\|\fatw_T\|_1 = 3\|\fatv_T\|_1$, we have $\|\fatr\|_1 \leq 4\|\fatv_{S^c}^*\|_1$.
+\begin{equation}
+\|\fatr\|^2
+\leq \|\fatr\|_1 \|\fatr\|_\infty
+\leq 4\|\fatv_{S^c}^*\|_1 \cdot \|\fatv_T\|_1 / s
+\leq 4\|\fatv_{S^c}^*\|_1 \|\fatv\| / \sqrt{s}.
+\end{equation}
+Also,
+\begin{equation}
+w_{k'} r_{k'}
+\leq |v_{k'}| |r_{k'}|
+\leq 4\|\fatv_{S^c}^*\|_1 \cdot \|\fatv_T\|_1 / s
+\leq 4\|\fatv_{S^c}^*\|_1 \|\fatv\| / \sqrt{s}.
+\end{equation}
+Thus,
+\begin{equation}
+\|\fatw\|^2 \geq \|\fatv\|^2 - 12 \|\fatv_{S^c}^*\|_1 \|\fatv\| / \sqrt{s}.
+\end{equation}
+We turn to the second term.
+To bound the $\infty$-norm of $\hat\Hb_1(\fattheta)$, we appeal to Assumption \ref{hyp:bdd_den_ratio}.
+\begin{equation}
+\begin{aligned}
+\|\hat\Hb_1(\fattheta)\|_\infty
+&= \max_{k,\ell} \left| \fate_k^\top \hat\Hb_1(\fattheta) \fate_\ell \right| \\
+&= \max_{k\ell} \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \left( \psi_k(\faty_k^{(j)}) - \mu_{\psi(y),k} \right) \left( \psi_\ell(\faty_\ell^{(j)}) - \mu_{\psi(y),\ell} \right) \hat r(\faty^{(j)};\fattheta) \right|
+\leq \frac{4 M_\psi^2 M_r}{m_r}.
+\end{aligned}
+\end{equation}
+It is easy to see that $\|\fatw\|_1 \leq 4\sqrt{s}\|\fatv\|$, so that
+\begin{equation}
+\|\hat\Hb_1(\fattheta)\|_\infty \|\fatw\|_1 \|\fatr\|_1
+\leq \frac{4 M_\psi^2 M_r}{m_r} \times 4\sqrt{s}\|\fatv\| \times 4\|\fatv_{S^c}^*\|_1
+\leq \frac{64 M_\psi^2 M_r \|\fatv_{S^c}^*\|_1}{m_r} \sqrt{s} \|\fatv\|.
+\end{equation}
+Putting everything together,
+\begin{equation}
+\fatv^\top \hat\Hb_1(\fattheta) \fatv
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2 - \frac{3\kappa^* m_r}{4 M_r \sqrt{s}} \|\fatv_{S^c}^*\|_1 \|\fatv\| - \frac{128 M_\psi^2 M_r}{m_r} \sqrt{s} \|\fatv_{S^c}^*\|_1 \|\fatv\|.
+\end{equation}
+\end{proof}
+
+\begin{lem} \label{lem:Hhat2}
+Let $\fattheta \in \mathcal{U}(\fattheta^*)$.
+Then,
+\begin{equation}
+\fatv^\top \hat\Hb_2(\fattheta) \fatv
+\leq \frac{4M_\psi^2 M_r^2}{m_r^2} \frac{\log p}{n_y} \|\fatv\|_1^2
+\end{equation}
+for any $\fatv$ with probability at least $1 - 2/p$.
+\end{lem}
+
+\begin{proof}
+Let $k \in [p]$.
+By Hoeffding's inequality, $|\psi_k(\faty_k)| \leq M_\psi$ implies
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) - \mu_{\psi(y),k} \right| \geq 2M_\psi \sqrt{\frac{\log p}{n_y}} \right\}
+\leq \frac{2}{p^2},
+\end{equation}
+so that by taking the union bound,
+\begin{equation}
+\PP\left\{ \left\| \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right\|_\infty \geq 2M_\psi \sqrt{\frac{\log p}{n_y}} \right\}
+\leq \frac{2}{p}.
+\end{equation}
+With this in mind, define an event
+\begin{equation}
+\mathcal{A}
+:= \left\{ \left\| \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right\|_\infty \leq 2M_\psi \sqrt{\frac{\log p}{n_y}} \right\},
+\end{equation}
+Using the fact that the sample average of $\hat r(\faty^{(j)};\fattheta)$'s is $1$,
+\begin{multline}
+\fatv^\top \hat\Hb_2(\fattheta) \fatv \\
+= \left\langle \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) \hat r(\faty^{(j)};\fattheta) - \fatmu_{\psi(y)}, \fatv \right\rangle^2
+= \left\langle \frac{1}{n_y} \sum_{j=1}^{n_y} \left( \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right) \hat r(\faty^{(j)};\fattheta), \fatv \right\rangle^2.
+\end{multline}
+This means that when $\fattheta \in \mathcal{U}(\fattheta^*)$, on $\mathcal{A}$,
+\begin{equation}
+\begin{aligned}
+\fatv^\top \hat\Hb_2(\fattheta) \fatv
+&\leq \frac{M_r^2}{m_r^2} \left\langle \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)}, \fatv \right\rangle^2 \\
+&\leq \frac{M_r^2}{m_r^2} \left\| \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) - \fatmu_{\psi(y)} \right\|_\infty^2 \|\fatv\|_1^2
+\leq \frac{4M_\psi^2 M_r^2}{m_r^2} \frac{\log p}{n_y} \|\fatv\|_1^2.
+\end{aligned}
+\end{equation}
+Since $\PP(\mathcal{A}^2) \leq 2/p$, the above holds with probability at least $1 - 2/p$.
+\end{proof}
+
+\begin{prop}
+Let $\fattheta \in \mathcal{U}(\fattheta^*)$.
+Let
+\begin{equation}
+\mathcal{E}_1 := \mathcal{E}(S_1;\fattheta^*)
+\quad \text{and} \quad
+\mathcal{E}_2 := \mathcal{E}(S_2;\fatomega_{n_y}^*).
+\end{equation}
+Then, with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s) - 2 / p$,
+\begin{enumerate}
+\item for all $\fatv \in \mathcal{E}_1$,
+\begin{equation}
+\fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv \geq \left( \kappa_1 - \kappa_2 \frac{s_1 \log p}{n_y} \right) \|\fatv\|^2,
+\end{equation}
+\item for all $\fatv \in \mathcal{E}_2$,
+\begin{multline}
+\fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv
+\geq \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \|\fatv\|^2 \\
+- \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} \right) \|\fatv\| - \tau_4 s_2 \left( \frac{\log p}{n_y} \right)^2.
+\end{multline}
+\end{enumerate}
+$\kappa_1, \kappa_2, \tau_1, \tau_2, \tau_3, \tau_4 > 0$ are constants defined in the proof.
+\end{prop}
+
+\begin{proof}
+We combine Lemmas \ref{lem:Hhat1} and \ref{lem:Hhat2} with norm bounds.
+When $\fatv \in \mathcal{E}_1$, $\|\fatv\|_1 \leq 4\sqrt{s_1} \|\fatv\|$, so that
+\begin{equation}
+\fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv
+\geq \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2 - \frac{4M_\psi^2 M_r^2}{m_r^2} \frac{\log p}{n_y} \|\fatv\|_1^2
+\geq \left( \frac{\kappa^* m_r}{16 M_r} - \frac{64M_\psi^2 M_r^2}{m_r^2} \frac{s_1 \log p}{n_y} \right) \|\fatv\|^2.
+\end{equation}
+When $\fatv \in \mathcal{E}_2$, $\|\fatv\|_1 \leq 4\sqrt{s_2}\|\fatv\| + 4\|\fatomega_{n_y,S_2^c}^*\|_1$, and
+\begin{multline}
+\|\fatomega_{n_y,S_2^c}^*\|_1
+\leq C_\omega \sqrt{\frac{\log p}{n_y}} \|\fatomega_{n_y,S_2}^*\|_1 \\
+\leq C_\omega \sqrt{\frac{s_2 \log p}{n_y}} \|\fatomega_{n_y,S_2}^*\|
+\leq C_\omega \sqrt{\frac{s_2 \log p}{n_y}} \|\fatomega_{n_y}^*\|
+\leq \frac{C_\omega}{\lambda_{\min}} \sqrt{\frac{s_2 \log p}{n_y}},
+\end{multline}
+so that
+\begin{equation}
+\begin{aligned}
+& \fatv^\top \nabla^2 \ell_\text{KLIEP}(\fattheta) \fatv \\
+\geq & \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2 - \frac{4M_\psi^2 M_r^2}{m_r^2} \frac{\log p}{n_y} \|\fatv\|_1^2 - \left( \frac{3\kappa^* m_r}{4M_r} \frac{1}{\sqrt{s_2}} + \frac{128M_\psi^2 M_r}{m_r} \sqrt{s_2} \right) \|\fatomega_{n_y,S_2^c}^*\|_1 \|\fatv\| \\
+\geq & \frac{\kappa^* m_r}{16 M_r} \|\fatv\|^2 \\
+&- \frac{64M_\psi^2 M_r^2}{m_r^2} \frac{s_2 \log p}{n_y} \left( \|\fatv\| + \frac{C_\omega}{\lambda_{\min}} \sqrt{\frac{\log p}{n_y}} \right)^2 \\
+&- \left( \frac{3\kappa^* m_r C_\omega}{4\lambda_{\min} M_r} \sqrt{\frac{\log p}{n_y}} + \frac{128M_\psi^2 M_r C_\omega}{\lambda_{\min} m_r} s_2 \sqrt{\frac{\log p}{n_y}} \right) \|\fatv\| \\
+\geq & \left( \frac{\kappa^* m_r}{16 M_r} - \frac{64M_\psi^2 M_r^2}{m_r^2} \frac{s_2 \log p}{n_y} \right) \|\fatv\|^2 \\
+&- \left( \frac{3\kappa^* m_r C_\omega}{4\lambda_{\min} M_r} \sqrt{\frac{\log p}{n_y}} + \frac{128M_\psi^2 M_r}{\lambda_{\min} m_r C_\omega} s_2 \sqrt{\frac{\log p}{n_y}} + \frac{128M_\psi^2 M_r^2 C_\omega}{\lambda_{\min} m_r^2} s_2 \left( \frac{\log p}{n_y} \right)^{3/2} \right) \|\fatv\| \\
+&- \frac{64M_\psi^2 M_r^2 C_\omega^2}{\lambda_{\min}^2 m_r^2} s_2 \left( \frac{\log p}{n_y} \right)^2.
+\end{aligned}
+\end{equation}
+Taking
+\begin{equation*}
+\begin{aligned}
+\kappa_1 :&= \frac{\kappa^2 m_r}{16 M_r}, &
+\kappa_2 :&= \frac{64M_\psi^2 M_r^2}{m_r^2}, \\
+\tau_1 :&= \frac{3\kappa^* m_r C_\omega}{4\lambda_{\min} M_r}, &
+\tau_2 :&= \frac{128M_\psi^2 M_r C_\omega}{\lambda_{\min} m_r}, &
+\tau_3 :&= \frac{128M_\psi^2 M_r^2 C_\omega}{\lambda_{\min} m_r^2}, &
+\tau_4 :&= \frac{64M_\psi^2 M_r^2 C_\omega^2}{\lambda_{\min}^2 m_r^2}
+\end{aligned}
+\end{equation*}
+complete the proof.
+\end{proof}
+
+\section{Consistency of the Initial Estimators}
+
+The arguments of this section largely follows the development of a more general theorem in (Negahban et al., 2012).
+We present them mostly to keep the exposition as self-contained as possible.
+
+\begin{lem} \label{lem:consistency1}
+Suppose the conditions of {\color{red} Section} all hold.
+Suppose the sample size satisfies
+\begin{equation}
+n_y
+\geq \max\left\{ (C_{n_y} s \log p) \log^3 ( C_{n_y} s \log p ), \frac{32 \kappa_2}{\kappa_1} s_1 \log p \right\}.
+\end{equation}
+Then, the sparse KLIEP with the regularization parameter
+\begin{equation}
+\lambda_1 \geq C_1 \sqrt{\log p / n}
+\end{equation}
+has an optimal solution $\check\fattheta$ satisfying
+\begin{equation}
+\|\check\fattheta - \fattheta^*\|_1 \leq K_1 \sqrt{s_1^2 \log p / n}
+\end{equation}
+for some $K_1 > 0$ with probability at least
+\begin{equation}
+1 - 6\exp(-n \lambda_1^2 / C_1^2).
+\end{equation}
+\end{lem}
+
+\noindent
+$C_1 > 0$ is defined in Lemma \ref{lem:grad1} in Appendix \ref{app:grads}.
+
+\begin{proof}
+Define a function $f : \RR^p \to \RR$,
+\begin{equation}
+f(\fatdelta)
+:= \ell_\text{KLIEP}(\fattheta^* + \fatdelta) - \ell_\text{KLIEP}(\fattheta^*) + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\},
+\end{equation}
+i.e.~the deviation of the objective from the value at $\fattheta^*$.
+We remark that $f(\mathbf{0}) = 0$, and hence $f(\check\fattheta - \fattheta^*) \leq 0$, as $\check\fattheta$ is the minimizer of the objective.
+Recall
+\begin{equation}
+\mathcal{E}_1
+= \mathcal{E}(S_1,\fattheta^*)
+= \{\fatdelta \in \RR^p : \|\fatdelta_{S_1^c}\|_1 \leq 3\|\fatdelta_{S_1}\|_1\}.
+\end{equation}
+Put $\check\fatdelta = \check\fattheta - \fattheta^*$.
+Our first step is to deduce $\check\fatdelta \in \mathcal{E}_1$ using $f(\check\fatdelta) \leq 0$.
+Since $\ell_\text{KLIEP}$ is convex,
+\begin{equation}
+\ell_\text{KLIEP}(\fattheta^* + \fatdelta) - \ell_\text{KLIEP}(\fattheta^*)
+\geq \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle
+\geq -\|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \|\fatdelta\|_1,
+\end{equation}
+by Cauchy-Schwarz.
+On the other hand,
+\begin{equation}
+\begin{aligned}
+\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1
+&\geq \|\fattheta_{S_1}^* + \fatdelta_{S_1^c}\|_1 - \|\fattheta_{S_1^c}^* + \fatdelta_{S_1}\|_1 - \|\fattheta_{S_1}^* + \fattheta_{S_1^c}^*\|_1 \\
+&= \|\fattheta_{S_1}^*\|_1 + \|\fatdelta_{S_1^c}\|_1 - \|\fattheta_{S_1^c}^*\|_1 - \|\fatdelta_{S_1}\|_1 - \|\fattheta_{S_1}^*\|_1 - \|\fattheta_{S_1^c}^*\|_1 \\
+&= \|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1 - 2\|\fattheta_{S_1^c}^*\|_1,
+\end{aligned}
+\end{equation}
+and as $\fattheta_{S_1^c}^* = \mathbf{0}$, the inequality simplifies to
+\begin{equation}
+\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1
+\geq \|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1.
+\end{equation}
+Thus,
+\begin{equation}
+\begin{aligned}
+0
+\geq f(\check\fatdelta)
+&= \ell_\text{KLIEP}(\fattheta^* + \check\fatdelta) - \ell_\text{KLIEP}(\fattheta^*) + \lambda_1 \{\|\fattheta^* + \check\fatdelta\|_1 - \|\fattheta^*\|_1\} \\
+&\geq -\|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \|\fatdelta\|_1 + \lambda_1 \{\|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1\}.
+\end{aligned}
+\end{equation}
+By Lemma \ref{lem:grad1},
+\begin{equation} \label{eq:applying_grad1}
+\PP\left\{ \|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \leq \lambda_1 / 2 \right\}
+\geq 1 - 6\exp(-n \lambda_1^2 / C_1^2).
+\end{equation}
+Thus,
+\begin{equation}
+0 \geq -\frac{\lambda_1}{2} \|\fatdelta\|_1 + \lambda_1 \{\|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1\}.
+\end{equation}
+Since $\lambda_1 > 0$, we must have $\check\fatdelta \in \mathcal{E}_1$.
+
+Our next step is to show that if $f(\fatdelta) > 0$ for all $\fatdelta \in \mathcal{E}_1$ with $\|\fatdelta\| = \rho$, then $\|\check\fatdelta\| \leq \rho$.
+Note that if the statement is true, then proving the theorem boils down to finding $\rho > 0$ for which the condition is satisfied.
+
+We will prove the contrapositive of the statement.
+Suppose $\|\check\fatdelta\| > \rho$.
+Then, for some $t \in (0,1)$, $\|t\check\fatdelta\| = \rho$, and $t\check\fatdelta \in \mathcal{E}_1$, because $\mathcal{E}_1$ is a cone.
+Since $f$ is convex, Jensen's inequality implies
+\begin{equation}
+f(t\check\fatdelta)
+= f(t\check\fatdelta + (1-t)\mathbf{0})
+\leq tf(\check\fatdelta) + (1-t)f(\mathbf{0})
+\leq f(\check\fatdelta)
+\leq 0.
+\end{equation}
+Thus, $t\check\fatdelta \in \mathcal{E}_1$ with $\|t\check\fatdelta\| = \rho$, but $f(t\check\fatdelta) \leq 0$.
+
+For the last step, fix $0 < \rho < \diam(\mathcal{U}(\fattheta))$, and suppose $\fatdelta \in \mathcal{E}_1$ with $\|\fatdelta\| = \rho$.
+By Taylor's theorem,
+\begin{equation}
+\ell_\text{KLIEP}(\fattheta^*+\fatdelta) - \ell_\text{KLIEP}(\fattheta^*)
+= \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \frac{1}{2} \fatdelta^\top \bar\Hb \fatdelta,
+\end{equation}
+where
+\begin{equation}
+\bar\Hb = \int_0^1 \nabla^2 \ell_\text{KLIEP}(\fattheta^*+t\fatdelta) \, dt.
+\end{equation}
+By Proposition \ref{prop:RSC},
+\begin{equation}
+\fatdelta^\top \bar\Hb \fatdelta
+\geq \kappa \|\fatdelta\|^2 - \kappa_3 \frac{\log p}{n_y} \|\fatdelta\|_1^2
+\geq \left( \kappa - 16 \kappa_3 \frac{s_1 \log p}{n_y} \right) \|\fatdelta\|^2
+\geq \frac{\kappa}{2}  \|\fatdelta\|^2,
+\end{equation}
+where the last inequality uses $n_y \geq 32 (\kappa_3 / \kappa) s_1 \log p$.
+Thus,
+\begin{equation}
+\begin{aligned}
+f(\fatdelta)
+&= \ell_\text{KLIEP}(\fattheta^* + \fatdelta) - \ell_\text{KLIEP}(\fattheta^*) + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
+&= \frac{1}{2} \fatdelta^\top \bar\Hb \fatdelta + \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
+&\geq \frac{\kappa}{4} \|\fatdelta\|^2 + \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\}.
+\end{aligned}
+\end{equation}
+On the other hand,
+\begin{multline}
+\langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
+\geq -\frac{\lambda_1}{2} \{\|\fatdelta_{S_1^c}\| + \|\fatdelta_{S_1}\|_1\} + \lambda_1 \{\|\fatdelta_{S_1^c}\| - \|\fatdelta_{S_1}\|_1\} \\
+\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1 + \frac{1}{2} \lambda_1 \|\fatdelta_{S_1^c}\|_1
+\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1
+\geq -\frac{3}{2} \lambda_1 \sqrt{s_1	} \|\fatdelta\|.
+\end{multline}
+Therefore,
+\begin{equation}
+f(\fatdelta)
+\geq \frac{\kappa}{4} \|\fatdelta\|^2 - \frac{3}{2} \lambda_1 \sqrt{s} \|\fatdelta\|.
+\end{equation}
+This is strictly positive when $\|\fatdelta\| > 6 \lambda_1 \sqrt{s_1} / \kappa$, and hence
+\begin{equation}
+\|\check\fattheta - \fattheta^*\| \leq \frac{6 C_1}{\kappa} \sqrt{\frac{s_1 \log p}{n}}.
+\end{equation}
+Finally,
+\begin{equation}
+\|\check\fattheta - \fattheta^*\|_1
+\leq 4 \sqrt{s_1} \|\check\fattheta - \fattheta^*\|
+\leq \frac{24 C_1}{\kappa} \sqrt{\frac{s_1^2 \log p}{n}}.
+\end{equation}
+\end{proof}
+
+\begin{lem} \label{lem:consistency2}
+Suppose Assumptions \ref{hyp:BSS}, \ref{hyp:IPC}, \ref{hyp:sp} and \ref{hyp:CRME} all hold.
+Assume, in addition, that
+\begin{equation}
+n \geq (K_1 / \|\fattheta^*\|)^2 s_1^2 \log p
+\quad \text{and} \quad
+n_y \geq (2 \kappa_2 / \kappa_1) s_2 \log p.
+\end{equation}
+Then, the solution to the second step optimization problem with regularization parameter $\lambda_2(n) \geq (C_\mu \vee C_\mu' s) \, \|\fatomega_{n_y}^*\|_1 \sqrt{\log p / n}$ has an optimal solution $\check\fatomega$ satisfying
+\begin{equation}
+\|\check\fatomega - \fatomega_{n_y}^*\|_1 = O_{\PP}\left( \sqrt{\frac{s_2^3 \log p}{n}} \right)
+\end{equation}
+for some $K_2 > 0$ with probability at least
+\end{lem}
+
+\begin{proof}
+The proof follows the same line of argument as in the proof of Lemma \ref{lem:consistency1} but with some adjustments made to handle approximate sparsity.
+Specifically, the proof proceeds in three steps.
+First, we show that the approximation error $\check\fatomega  - \fatomega_{n_y}^*$ belongs to a star-shaped set, next, we establish a condition for $\rho > 0$ such that $\|\check\fatomega  - \fatomega_{n_y}^*\| < \rho$, and we finish by constructing such a $\rho$.
+
+Recall that $\fatomega_{n_y}^*$ partitions into strong signals $\fatomega_{n_y,S_2}^*$ and weak signals $\fatomega_{n_y,S_2^c}^*$ with
+\begin{equation}
+\|\fatomega_{n_y,S_2^c}^*\|_1 \leq C_\omega \frac{\log p}{n_y} \|\fatomega_{n_y,S_2}^*\|_1.
+\end{equation}
+and that
+\begin{equation}
+\mathcal{E}_2
+= \mathcal{E}(S_2,\fatomega_{n_y}^*)
+= \{\fatdelta \in \RR^p : \|\fatdelta_{S_2^c}\|_1 \leq 3\|\fatdelta_{S_2}\|_1 + 4\|\fatomega_{n_y,S_2^c}^*\|_1\}.
+\end{equation}
+
+The first part of the proof is unchanged, except that we make use of Lemma \ref{lem:grad2} rather than Lemma \ref{lem:grad1} in (\ref{eq:applying_grad1}).
+This gives us $\check\fatdelta := \check\fatomega - \fatomega_{n_y}^* \in \mathcal{E}_2$
+
+In the proof of the previous lemma, the second step exploited the fact that $\fatdelta \in \mathcal{E}_1$ implies that $t\fatdelta \in \mathcal{E}_1$ for all $t \in [0,1]$, an easy consequence of $\mathcal{E}_1$ being a cone.
+This is no longer as obvious for $\mathcal{E}_2$, so is given in the form of an intermediate result in Lemma \ref{lem:star_shaped}.
+
+We now come to the final step.
+Since $\ell_\text{de-bias}$ is quadratic in $\fatomega$, the second-order Taylor expansion is exact, and we actually have
+\begin{equation}
+\ell_\text{de-bias}(\fatomega_{n_y}^*+\fatdelta) - \ell_\text{de-bias}(\fatomega_{n_y}^*)
+= \langle \nabla \ell_\text{de-bias}(\fatomega_{n_y}^*), \fatdelta \rangle + \frac{1}{2} \fatdelta^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta) \fatdelta.
+\end{equation}
+As before, we would like to appeal to Proposition \ref{prop:RSC} to bound the quadratic term from the below.
+Looking at the conditions of Proposition \ref{prop:URSC}, we are able to do this, so long as $\check\fattheta \in \mathcal{U}(\fattheta^*)$, and by the previous lemma, this is the case with probability at least $1 - 6\exp(n \lambda_1^2 / C_1^2)$.
+\begin{equation}
+n \geq (K_1 / \|\fattheta^*\}|)^2 s_1^2 \log p.
+\end{equation}
+
+With only an approximately sparsity assumption $\fatomega_{n_y}^*$, the second bound in the conclusion of Proposition \ref{prop:RSC} applies, which is
+\begin{multline}
+\fatdelta^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta) \fatv
+\geq \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \|\fatdelta\|^2 \\
+- \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} \right) \|\fatdelta\| - \tau_4 s_2 \left( \frac{\log p}{n_y} \right)^2.
+\end{multline}
+Also,
+\begin{equation}
+\begin{aligned}
+\langle \nabla \ell_\text{de-bias}(\fatomega_{n_y}^*), \fatdelta \rangle &+ \lambda_2 \{\|\fatomega_{n_y}^* + \fatdelta\|_1 - \|\fatomega_{n_y}^*\|_1\} \\
+&\geq -\frac{\lambda_2}{2} \{\|\fatdelta_{S_2^c}\| + \|\fatdelta_{S_2}\|_1\} + \lambda_2 \{\|\fatdelta_{S_2^c}\| - \|\fatdelta_{S_2}\|_1 - 2\|\fatomega_{S_2^c}^*\|_1\} \\
+&\geq -\frac{3}{2} \lambda_2 \|\fatdelta_{S_2}\|_1 - 2\lambda_2 \|\fatomega_{S_2^c}^*\|_1 + \frac{1}{2} \lambda_2 \|\fatdelta_{S_2^c}\|_1 \\
+&\geq -\frac{3}{2} \lambda_2 \|\fatdelta_{S_2}\|_1 - 2\lambda_2 \|\fatomega_{S_2^c}^*\|_1 \\
+&\geq -\frac{3}{2} \lambda_2 \sqrt{s_2} \|\fatdelta\| - \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}}.
+\end{aligned}
+\end{equation}
+Collecting terms,
+\begin{multline} \label{eq:f(delta)}
+f(\fatdelta)
+\geq \frac{1}{2} \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \|\fatdelta\|^2 \\
+- \frac{1}{2} \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3\lambda_2 \sqrt{s_2} \right) \|\fatdelta\| \\
+- \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 - \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}}.
+\end{multline}
+Provided $n_y \geq 2 (\kappa_2 / \kappa_1) s_2 \log p$,
+\begin{equation}
+\frac{1}{2} \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \geq \frac{\kappa_1}{4} := a
+\end{equation}
+is positive.
+Plugging in $\lambda_2 = C_2 s_1 \sqrt{s_2 \log p / n} + C_\omega C_2 s_1 \sqrt{s_2} \log p / \sqrt{n n_y}$,
+\begin{multline}
+\tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3\lambda_2 \sqrt{s_2} \\
+= \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3C_2 s_1 s_2 \sqrt{\frac{\log p}{n}} + 3 C_\omega C_2 s_1 s_2 \frac{\log p}{n}
+\end{multline}
+and
+\begin{multline}
+\frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}} \\
+= \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_\omega C_2}{\lambda_{\min}} s_1 s_2 \frac{\log p}{\sqrt{n n_y}} + \frac{2C_\omega^2 C_2}{\lambda_{\min}} s_1 s_2 \frac{\log p}{\sqrt{n n_y}}.
+\end{multline}
+
+\begin{multline}
+\frac{1}{2} \left( \tau_1 \delta_{n_y} + \tau_2 \delta_{n_y} s_2 + \tau_3 \frac{\delta_{n_y} s_2 \log p}{n_y} + 3\lambda_2 \sqrt{s_2} \right) \\
+= \frac{1}{2} \left( \tau_1' \sqrt{\frac{\log p}{n_y}} + \tau_2' s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3' s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3 \, C_2 \frac{s_1 s_2 \log p}{\sqrt{n n_y}} + 3 \, C_2 \frac{s_1 s_2 \log p}{\sqrt{n n_y}} \right) \\
+= \frac{1}{2} \left( \tau_1' \frac{1}{s_2} + \tau_2' + \tau_3' \frac{\log p}{n_y} + 3 \, C_2 s_1 \sqrt{\frac{\log p}{n}} + 3 \, C_2 s_1 \sqrt{\frac{\log p}{n}} \right) s \sqrt{\frac{\log p}{n_y}}
+:= b \cdot s \sqrt{\frac{\log p}{n}}
+\end{multline}
+and
+\begin{multline}
+\frac{\tau_4}{2} \frac{\delta_{n_y}^2 s_2 \log p}{n_y} + 2\lambda_{\min}^{-1} \lambda_2 \delta_{n_y} \sqrt{s_2} \\
+\leq \left( \frac{\tau_4}{2} \frac{\log p}{s_1 n_y} + \frac{2 \, C_2}{\lambda_{\min}} \sqrt{\frac{\log p}{n_y}} + \frac{2 \, C_2}{\lambda_{\min}} \right) \frac{s^2 \log p}{n}
+=: c \cdot \frac{s^2 \log p}{n}.
+\end{multline}
+From (\ref{eq:f(delta)}), we have arrived at
+\begin{equation}
+f(\fatdelta) \geq a\|\fatdelta\|^2 - b \cdot s \sqrt{\frac{\log p}{n}} \|\fatdelta\| - c \cdot \frac{s^2 \log p}{n}.
+\end{equation}
+Since $a > 0$, this is positive for
+\begin{equation}
+\|\fatdelta\| \geq \frac{b + \sqrt{b^2 + 4ac}}{2a} \sqrt{\frac{s^2 \log p}{n}}.
+\end{equation}
+This implies
+\begin{equation}
+\|\check\fatomega - \fatomega_{n_y}^*\| \leq \frac{b + \sqrt{b^2 + 4ac}}{2a} \sqrt{\frac{s^2 \log p}{n}}.
+\end{equation}
+Finally,
+\begin{equation}
+\begin{aligned}
+\|\hat\fatomega - \fatomega_{n_y}^*\|_1
+&\leq 4\sqrt{s_2} \|\check\fatomega - \fatomega_{n_y}^*\|_2 + 4\|\fatomega_{n_y,S_2^c}\|_1 \\
+&\leq \frac{2b + 2\sqrt{b^2 + 4ac}}{a} \sqrt{\frac{s_2 s^2 \log p}{n}} + \frac{4 C_\omega}{\lambda_{\min}} \sqrt{\frac{s_2 \log p}{n_y}} \\
+&\leq \left( \frac{2b + 2\sqrt{b^2 + 4ac}}{a} + \frac{4 C_\omega}{\lambda_{\min}} \frac{1}{s} \right) \sqrt{\frac{s_2 s^2  \log p}{n_y}}.
+\end{aligned}
+\end{equation}
+Since $b$ and $c$ tend to a constant, and $s$ tend to infinity, the conclusion follows.
+\end{proof}
+
+\begin{lem} \label{lem:star_shaped}
+For any $\fatw^* \in \RR^p$ and $S \subseteq [p]$, $\mathcal{E}(S;\fatw^*)$ is star-shaped, i.e.~if $\fatdelta \in \mathcal{E}(S;\fatw^*)$, then $t\fatdelta \in \mathcal{E}(S;\fatw^*)$ for all $t \in [0,1]$.
+\end{lem}
+
+\begin{proof}
+Let $\fatdelta \in \mathcal{E}(S:\fatw^*)$.
+\begin{equation}
+\|(t\fatdelta)_{S^c}\|_1
+= t \|\fatdelta_{S^c}\|_1
+\leq 3t \|\fatdelta_S\|_1 + 4t \|\fatw_{S^c}^*\|_1
+= 3 \|(t\fatdelta)_S\|_1 + 4t \|\fatw_{S^c}^*\|_1.
+\end{equation}
+When $t \in (0,1)$, then
+\begin{equation}
+\|(t\fatdelta)_{S^c}\|_1 \leq 3 \|(t\fatdelta)_S\|_1 + 4\|\fatw_{S^c}^*\|_1,
+\end{equation}
+and $t\fatdelta \in \mathcal{E}(S;\fatw^*)$ also.
+\end{proof}
+
+\section{Asymptotics} \label{app:asymp}
+
+Lemma \ref{lem:Berry_Esseen_CLT} is meaningful when
+\begin{equation}
+(1+\delta_{n_y})^2 s_2 = o(n^\alpha)
+\quad\text{and}\quad
+n_y^{-1 / (1+2\alpha)} = O(n^{-1})
+\quad\text{for some}\quad
+\alpha > 0,
+\end{equation}
+in which case, it implies
+\begin{equation}
+\PP\left\{ \sqrt{n} \, \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle \leq z \right\}
+= \Phi(z) + o(1).
+\end{equation}
+
+\begin{lem} \label{lem:Berry_Esseen_CLT}
+Let
+\begin{equation}
+\sigma_{n_y}^2
+:= \Var_x \left[ \langle \fatomega_{n_y}^*, \fatpsi(\fatx) - \fatmu \rangle \right].
+\end{equation}
+For any $\alpha \in \RR$,
+\begin{multline}
+\sup_{z \in \RR} \left| \PP\left\{ \sqrt{n} \, \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle \leq z \right\} - \Phi(z) \right| \\
+\leq \frac{c_1 \sigma_{n_y}^{-1}}{\sqrt{n^\alpha} / (1+\delta_{n_y}) \sqrt{s_2}} + 4 \exp\left( -\frac{c_2 \sigma_{n_y}^2 n_y}{(1+\delta_{n_y})^2 s_2 \, n^{1+\alpha}} \right),
+\end{multline}
+where $\Phi$ is the standard normal cdf, and $c_1, c_2 > 0$ are constants depending on $m_r$, $M_r$, $M_\psi$, and $\lambda_{\min}$ only.
+\end{lem}
+
+\begin{proof}
+Recall $\fatmu = \EE_x[\fatpsi(\fatx)] = \EE_y[\fatpsi(\faty) r(\faty;\fattheta^*)]$, and expand
+\begin{equation}
+\begin{aligned}
+\nabla & \ell_\text{KLIEP}(\fattheta^*) \\
+&= -\frac{1}{n} \sum_{i=1}^{n} \fatpsi(\fatx^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \\
+&= -\frac{1}{n} \sum_{i=1}^{n} \fatpsi(\fatx^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) + \frac{1}{n_y} \sum_{j=1}^{n_y} \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right).
+\end{aligned}
+\end{equation}
+Then,
+\begin{multline}
+\sqrt{n} \, \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \nabla \ell_\text{KLIEP}(\fattheta^*) \rangle \\
+= -\frac{1}{\sqrt{n}} \sum_{i=1}^n \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle
++ \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) - \fatmu \right\rangle \\
++ \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right\rangle.
+\end{multline}
+Consider the first sum.
+Clearly,
+\begin{equation}
+\left| \frac{\langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle}{\sigma_{n_y} \sqrt{n}} \right|
+\leq \frac{\|\fatomega_{n_y}^*\|_1 \|\fatpsi(\fatx^{(i)}) - \fatmu\|_\infty}{\sigma_{n_y} \sqrt{n}}
+\leq \frac{2 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n}},
+\end{equation}
+and
+\begin{equation}
+\EE_x \left[ \frac{1}{\sqrt{n}} \sum_{i=1}^n \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle \right] = 0
+\quad\text{and}\quad
+\Var_x \left[ \frac{1}{\sqrt{n}} \sum_{i=1}^n \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle \right] = 1.
+\end{equation}
+By Berry-Esseen Theorem for the bounded independent random variables,
+\begin{equation}
+\sup_{z \in \RR} \left| \PP\left\{ \frac{1}{\sqrt{n}} \sum_{i=1}^n \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle \leq z \right\} - \Phi(z) \right| \leq \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n}}.
+\end{equation}
+Now, fix $\alpha \in \RR$.
+By Lemma \ref{lem:Hoeffding_dot_psi_r} and Lemma \ref{lem:Hoeffding_dot_psi_rhat_minus_r},
+\begin{equation}
+\PP\left\{ \left| \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) - \fatmu \right\rangle \right| \geq \frac{1}{\sqrt{n^\alpha}} \right\}
+\leq 2\exp\left( -\frac{\sigma_{n_y}^2}{2 M_\psi^2 M_r^2 \|\fatomega_{n_y}^*\|_1^2} \frac{n_y}{n^{1+\alpha}} \right)
+\end{equation}
+and
+\begin{multline}
+\PP\left\{ \left| \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right\rangle \right| \geq \frac{1}{\sqrt{n^
+\alpha}} \right\} \\
+\leq 2\exp\left( -\frac{2 m_r^2 \sigma_{n_y}^2}{M_\psi^2 M_r^2 \|\fatomega_{n_y}^*\|_1^2} \frac{n_y}{n^{1+\alpha}} \right).
+\end{multline}
+Put
+\begin{gather*}
+S_x := -\frac{1}{\sqrt{n}} \sum_{i=1}^n \sigma_{n_y}^{-1} \langle \fatomega_{n_y}^*, \fatpsi(\fatx^{(i)}) - \fatmu \rangle, \\
+S_y := \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) - \fatmu \right\rangle, \\
+S_r := \frac{\sqrt{n}}{n_y} \sum_{j=1}^{n_y} \sigma_{n_y}^{-1} \left\langle \fatomega_{n_y}^*, \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right\rangle.
+\end{gather*}
+Let $\bar S_y$ and $\bar S_r$ be truncated versions of $S_y$ and $S_r$, defined as
+\begin{equation}
+\bar S_y = \sgn(S_y)(|S_y| \wedge n^{-\alpha/2})
+\quad \text{and} \quad
+\bar S_r = \sgn(S_r)(|S_r| \wedge n^{-\alpha/2}).
+\end{equation}
+We have
+\begin{equation}
+|\PP\{ S_x + S_y + S_r \leq z \} - \PP\{ S_x + \bar S_y + \bar S_r \leq z \}|
+\leq \PP\left\{ |S_y| \geq \frac{1}{\sqrt{n^\alpha}} \right\} + \PP\left\{ |S_r|
+\geq \frac{1}{\sqrt{n^\alpha}} \right\}.
+\end{equation}
+Fix $z \geq 0$.
+\begin{equation}
+\begin{aligned}
+\PP\{ S_x + \bar S_y + \bar S_r \leq z \}
+&\geq \PP\left\{ S_x \leq z - \frac{2}{\sqrt{n^\alpha}} \right\} \\
+&\geq \Phi\left(z - \frac{2}{\sqrt{n^\alpha}} \right) - \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}} \\
+&= \Phi(z) - \PP\left\{ z - \frac{2}{\sqrt{n^\alpha}} \leq \Ncal(0,1) \leq z \right\} - \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}} \\
+&\geq \Phi(z) - \frac{2}{\sqrt{n^\alpha}} - \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}}
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+\PP\{ S_x + \bar S_y + \bar S_r \leq z \}
+&\leq \PP\left\{ S_x \leq z + \frac{2}{\sqrt{n^\alpha}} \right\} \\
+&\leq \Phi\left(z + \frac{2}{\sqrt{n^\alpha}} \right) + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}} \\
+&= \Phi(z) + \PP\left\{ z \leq \Ncal(0,1) \leq z + \frac{2}{\sqrt{n^\alpha}} \right\} + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}} \\
+&\leq \Phi(z) + \frac{2}{\sqrt{n^\alpha}} + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}}.
+\end{aligned}
+\end{equation}
+Thus,
+\begin{equation}
+|\PP\{ S_x + \bar S_y + \bar S_r \leq z \} - \Phi(z)|
+\leq \frac{2}{\sqrt{n^\alpha}} + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}}.
+\end{equation}
+Finally,
+\begin{equation}
+\begin{aligned}
+& |\PP\{ S_x + S_y + S_r \leq z \} - \Phi(z)| \\
+&\leq |\PP\{ S_x + S_y + S_r \leq z \} - \PP\{ S_x + \bar S_y + \bar S_r \leq z \}| + |\PP\{ S_x + \bar S_y + \bar S_r \leq z \} - \Phi(z)| \\
+&\leq \frac{2}{\sqrt{n^\alpha}} + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}} + \PP\left\{ |S_y| \geq \frac{1}{\sqrt{n^\alpha}} \right\} + \PP\left\{ |S_r| \geq \frac{1}{\sqrt{n^\alpha}} \right\} \\
+&\leq \frac{2}{\sqrt{n^\alpha}} + \frac{6.6 M_\psi \|\fatomega_{n_y}^*\|_1}{\sigma_{n_y} \sqrt{n^\alpha}}
++ 2\exp\left( -\frac{\sigma_{n_y}^2}{2 M_\psi^2 M_r^2 \|\fatomega_{n_y}^*\|_1^2} \frac{n_y}{n^{1+\alpha}} \right)
++ 2\exp\left( -\frac{2 m_r^2 \sigma_{n_y}^2}{M_\psi^2 M_r^2 \|\fatomega_{n_y}^*\|_1^2} \frac{n_y}{n^{1+\alpha}} \right) \\
+&\leq \frac{2 + 6.6 M_\psi \sigma_{n_y}^{-1} \|\fatomega_{n_y}^*\|_1}{\sqrt{n^\alpha}} + 4 \exp\left( -\frac{(\tfrac{1}{2} \wedge 2 m_r^2) \sigma_{n_y}^2}{M_\psi^2 M_r^2\|\fatomega_{n_y}^*\|_1^2} \frac{n_y}{n^{1+\alpha}} \right).
+\end{aligned}
+\end{equation}
+Since
+\begin{equation}
+\|\fatomega_{n_y}^*\|_1 \leq \lambda_{\min}^{-1} (1+\delta_{n_y}) \sqrt{s_2},
+\end{equation}
+\begin{multline}
+|\PP\{ S_x + S_y + S_r \leq z \} - \Phi(z)| \\
+\leq \frac{2 + 6.6 M_\psi \lambda_{\min}^{-1} \sigma_{n_y}^{-1}}{\sqrt{n^\alpha} / (1+\delta_{n_y}) \sqrt{s_2}} + 4 \exp\left( -\frac{(\tfrac{1}{2} \wedge 2 m_r^2) \lambda_{\min}^{-2} \sigma_{n_y}^2}{M_\psi^2 M_r^2} \frac{n_y}{(1+\delta_{n_y})^2 s_2 \, n^{1+\alpha}} \right).
+\end{multline}
+The $z \leq 0$ case is treated similarly.
+\end{proof}
+
+\begin{lem}
+For any $\beta \in (0,1)$,
+\begin{equation}
+\|\hat\Ib_{n_y}(\fattheta^*) - \fatSigma\|_\infty \leq O(n_y^{-\beta/2}).
+\end{equation}
+In particular, this implies
+\begin{equation}
+\lim_{n_y \to \infty} \sigma_{n_y}^2 = \sigma^2,
+\quad\text{where}\quad
+\sigma^2 := \fate_1^\top \fatSigma^{-1} \fate_1.
+\end{equation}
+\end{lem}
+
+\begin{proof}
+By (\ref{eq:EyH}) in Appendix \ref{app:EyH},
+\begin{equation}
+\Ib_{n_y}(\fattheta^*)
+= \EE_y[ \Hb_{n_y}(\fattheta^*) ]
+= \EE_y\left[ \frac{\hat Z^2(\fattheta^*)}{Z^2(\fattheta^*)} \nabla^2 \ell_\text{KLIEP}(\fattheta^*) \right]
+= \left( 1-\frac{1}{n_y} \right) \fatSigma,
+\end{equation}
+and hence,
+\begin{equation}
+\|\hat\Ib_{n_y}(\fattheta^*) - \fatSigma\|_\infty
+\leq \|\hat\Ib_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*)\|_\infty + \|\Ib_{n_y}(\fattheta^*) - \fatSigma\|_\infty
+\leq \|\hat\Ib_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*)\|_\infty + \frac{1}{n_y} \|\fatSigma\|_\infty.
+\end{equation}
+Now,
+\begin{equation}
+\hat\Ib_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*)
+= \EE_y[ \hat\Hb_{n_y}(\fattheta^*) - \Hb_{n_Y}(\fattheta^*) ]
+= \EE_y\left[ \left( \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right) \Hb_{n_y}(\fattheta^*) \right].
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+\|\hat\Ib_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*)\|_\infty:
+&=\max_{k,\ell} \left| \EE_y\left[ \left( \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right) \fate_k^\top \Hb_{n_y}(\fattheta^*) \fate_\ell \right] \right| \\
+&\leq \max_{k,\ell} \EE_y\left[ \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \left| \fate_k^\top \Hb_{n_y}(\fattheta^*) \fate_\ell \right| \right]
+\leq \|\fatSigma\|_\infty \EE_y\left[ \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \right].
+\end{aligned}
+\end{equation}
+So, it suffices to verify that the last expectation is vanishing.
+$r(\faty;\fattheta^*) \in [m_r,M_r]$ impies $|1-Z^2(\fattheta^*) / \hat Z^2(\fattheta^*)|$ is bounded.
+Specifically,
+\begin{equation}
+\frac{\hat Z(\fattheta^*)}{\hat Z(\fattheta^*)} = \frac{1}{n_y} \sum_{j=1}^{n_y} r(\faty^{(j)};\fattheta^*),
+\end{equation}
+so
+\begin{equation}
+\left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \leq \frac{M_r^2 - 1}{M_r^2} \vee \frac{1 - m_r^2}{m_r^2}.
+\end{equation}
+Fix $\beta \in (0,1)$, and define an event
+\begin{equation}
+\begin{aligned}
+\mathcal{B}:
+&= \left\{ 1-n_y^{-\beta / 2} < \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} < 1+n_y^{-\beta / 2} \right\} \\
+&= \left\{ \frac{1}{1+n_y^{-\beta / 2}} < \frac{Z(\fattheta^*)}{\hat Z(\fattheta^*)} < \frac{1}{1-n_y^{-\beta / 2}} \right\} \\
+&= \left\{ \frac{1}{\left( 1 + n_y^{-\beta/2} \right)^2} - 1 < \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)} - 1 < \frac{1}{\left(1 - n_y^{-\beta/2} \right)^2} - 1 \right\} \\
+&\subseteq \left\{ \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)} - 1 \right| < \frac{2 n_y^{-\beta/2} - n_y^{-\beta}}{1 - 2 n_y^{-\beta/2} + n_y^{-\beta}} \vee \frac{2 n_y^{-\beta/2} + n_y^{-\beta}}{1 + 2 n_y^{-\beta/2} + n_y^{-\beta}} \right\}.
+\end{aligned}
+\end{equation}
+By Lemma \ref{lem:Hoeffding_r}, $\PP_y(\mathcal{B}^c) \leq 2\exp( -2 n_y^{1-\beta} / (M_r - m_r)^2 )$ .
+Thus,
+\begin{equation}
+\begin{aligned}
+\EE_y & \left[ \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \right] \\
+&= \int_\mathcal{B} \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \, d\Ycal + \int_{\mathcal{B}^c} \left| \frac{Z^2(\fattheta^*)}{\hat Z^2(\fattheta^*)}-1 \right| \, d\Ycal \\
+&\leq \left( \frac{2 n_y^{-\beta/2} - n_y^{-\beta}}{1 - 2 n_y^{-\beta/2} + n_y^{-\beta}} \vee \frac{2 n_y^{-\beta/2} + n_y^{-\beta}}{1 + 2 n_y^{-\beta/2} + n_y^{-\beta}} \right) + \left( \frac{M_r^2 - 1}{M_r^2} \vee \frac{1 - m_r^2}{m_r^2} \right) \exp\left( -\frac{2 n_y^{1-\beta}}{(M_r - m_r)^2} \right) \\
+&\leq O(n_y^{-\beta/2}) + O(\exp(-2 n_y^{1-\beta} / (M_r - m_r)^2)).
+\end{aligned}
+\end{equation}
+Since $\beta \in (0,1)$,
+\begin{equation}
+\|\hat\Ib_{n_y}(\fattheta^*) - \fatSigma\|_\infty \leq O(n_y^{-1}) + O(n_y^{-\beta/2}) + o(1) = O(n_y^{-\beta/2}).
+\end{equation}
+Finally,
+\begin{equation}
+\sigma_{n_y}^2
+= \Var_x\left[ \langle \fatomega_{n_y}^*, \fatpsi(\fatx) - \fatmu \rangle \right]
+= \fatomega_{n_y}^{*\top} \Var_x\left[ \fatpsi(\fatx) - \fatmu \right] \fatomega_{n_y}^*
+= \fate_1^\top \hat\Ib_{n_y}^{-1}(\fattheta^*) \fatSigma \hat\Ib_{n_y}^{-1}(\fattheta^*) \fate_1.
+\end{equation}
+Since
+\begin{equation}
+\begin{aligned}
+\fatSigma^{-1} - \hat\Ib_{n_y}^{-1}(\fattheta^*) \fatSigma \hat\Ib_{n_y}^{-1}(\fattheta^*)
+&= \fatSigma^{-1} - \hat\Ib_{n_y}^{-1}(\fattheta^*) + \hat\Ib_{n_y}^{-1}(\fattheta^*) - \hat\Ib_{n_y}^{-1}(\fattheta^*) \fatSigma \hat\Ib_{n_y}^{-1}(\fattheta^*) \\
+&= \fatSigma^{-1} [ \hat\Ib_{n_y}(\fattheta^*) - \fatSigma ] \hat\Ib_{n_y}^{-1}(\fattheta^*) + \hat\Ib_{n_y}^{-1}(\fattheta^*) [ \hat\Ib_{n_y}(\fattheta^*) - \fatSigma ] \hat\Ib_{n_y}^{-1}(\fattheta^*),
+\end{aligned}
+\end{equation}
+the second statement follows from the first.
+\end{proof}
+
+\section{Technical Lemmas, Part 1} \label{app:grads}
+
+\begin{lem} \label{lem:grad1}
+Suppose Assumption \ref{hyp:bdd_den_ratio} holds.
+There exists $C_1 > 0$ such that if
+\begin{equation}
+\lambda_1 \geq C_1 \sqrt{\log p / n},
+\end{equation}
+then
+\begin{equation}
+\PP\left\{ 2\|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \geq \lambda_1 \right\}
+\leq 6\exp(-n \lambda_1^2 / C_1^2).
+\end{equation}
+\end{lem}
+
+\begin{proof}
+Observe
+\begin{equation}
+\fatmu
+= \EE_x[ \fatpsi(\faty) ]
+= \int \fatpsi(\faty) f_x(\faty) \, d\faty
+= \int \fatpsi(\faty) r(\faty;\fattheta^*) f_y(\faty) \, d\faty
+= \EE_y[ \fatpsi(\faty) r(\faty;\fattheta^*) ].
+\end{equation}
+For each $k \in [p]$, $\mu_k = \langle \fate_k, \fatmu \rangle$, and
+\begin{equation}
+\begin{aligned}
+\partial_k & \ell_\text{KLIEP}(\fattheta^*) \\
+=&-\frac{1}{n} \sum_{i=1}^{n} \psi_k(\fatx_k^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \\
+=& \underbrace{-\frac{1}{n} \sum_{i=1}^{n} \psi_k(\fatx_k^{(i)}) + \mu_k}_\text{(A)} \\
+&+ \underbrace{\frac{1}{n_y}\sum_{j=1}^{n_y} \psi_k(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) - \mu_k}_\text{(B)}
++ \underbrace{\frac{1}{n_y}\sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right)}_\text{(C)}.
+\end{aligned}
+\end{equation}
+$|\psi_k(\fatx_k)| \leq M_\psi$ and $|\psi_k(\faty_k) r(\faty;\fattheta^*)| \leq M_\psi M_r$ are bounded random variables, so Hoeffding's inequality implies
+\begin{equation}
+\PP\{ |\text{(A)}| \geq t \}
+= \PP\left\{ \left| \frac{1}{n} \sum_{i=1}^{n} \psi_k(\fatx_k^{(i)}) - \mu_k \right| \geq t \right\}
+\leq 2 \exp\left( -\frac{t^2 n}{2 M_\psi^2} \right)
+\end{equation}
+and
+\begin{equation}
+\PP\{ |\text{(B)}| \geq t \}
+= \PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) r(\faty^{(j)};\fattheta^*) - \mu_k \right| \geq t \right\}
+\leq 2 \exp\left( -\frac{t^2 n_y}{2 M_\psi^2 M_r^2} \right).
+\end{equation}
+As for (C), by Lemma \ref{lem:Hoeffding_psi_rhat_minus_r},
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 t^2 n_y}{M_\psi^2 M_r^2 (M_r - m_r)^2} \right).
+\end{equation}
+Now,
+\begin{equation}
+\{|\partial_k \ell_\text{KLIEP}(\fattheta^*)| \geq t\}
+\subseteq\left\{ |\text{(A)}| \geq t/3 \right\}\cup\left\{ |\text{(B)}| \geq t/3 \right\}\cup\left\{ |\text{(C)}| \geq t/3 \right\},
+\end{equation}
+so that
+\begin{equation}
+\begin{aligned}
+\PP & \{ |\partial_k \ell_\text{KLIEP}(\fattheta^*)| \geq t \} \\
+&\leq 2\exp\left( -\frac{t^2 n}{18 M_\psi ^2} \right) + 2\exp\left( -\frac{t^2 n_y}{18 M_\psi^2 M_r^2} \right) + 2\exp\left( -\frac{2 m_r^2 t^2 n_y}{9 M_\psi^2 M_r^2 (M_r - m_r)^2} \right) \\
+&\leq 6 \max\left\{ \exp\left( -\frac{t^2 n}{18 M_\psi ^2} \right), \exp\left( -\frac{t^2 n_y}{18 M_\psi^2 M_r^2} \right), \exp\left( -\frac{2 m_r^2 t^2 n_y}{9 M_\psi^2 M_r^2 (M_r - m_r)^2} \right) \right\} \\
+&= 6\exp\left( -\frac{t^2 n}{18 \max\{1, M_r, M_r (M_r - m_r) / (2 m_r)\}^2 M_\psi^2} \right).
+\end{aligned}
+\end{equation}
+Put $C_1 = 12 \max\{1, M_r, M_r (M_r - m_r) / (2 m_r)\} M_\psi$.
+Taking the union bound,
+\begin{equation}
+\PP\{ \|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \geq t \}
+\leq \sum_{k=1}^p \PP\{ |\partial_k \ell_\text{KLIEP}(\fattheta^*)| \geq t \}
+\leq 6\exp(-8 t^2 n / C_1^2 + \log p).
+\end{equation}
+Thus, if
+\begin{equation}
+\lambda_1 \geq C_1 \sqrt{\log p / n},
+\end{equation}
+then
+\begin{equation}
+\PP\left\{ 2 \|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \geq\lambda_1 \right\}
+\leq 6\exp(-n \lambda_1^2 / C_1^2).
+\end{equation}
+\end{proof}
+
+\begin{lem} \label{lem:grad2}
+Suppose the hypotheses of Lemma \ref{lem:consistency1} are satisfied.
+There exists $C_2 > 0$ such that if
+\begin{equation} \label{eq:lambda2}
+\lambda_2
+\geq C_2 \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_1^2 s_2 \log p}{n}},
+\end{equation}
+then
+\begin{multline}
+\PP\left\{ 2 \|\nabla \ell_\text{de-bias}(\fatomega^*)\|_\infty \geq \lambda_2 \right\} \\
+\leq 6\exp\left( -\frac{\lambda_1^2 n}{C_1^2} \right) + 2\exp\left( -\frac{\lambda_2^2 n_y}{C_2^2 (1+C_\omega \sqrt{\log p / n_y})^2 s_2}\right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+\end{lem}
+
+\begin{proof}
+Put $C_2 = \max\{ 2C_{\nabla^2 \ell} K_1, 4 C_\nu\}$.
+$n \leq n_y$, and as we may assume $s_1 \geq 1$, (\ref{eq:lambda2}) implies
+\begin{equation}
+\lambda_2
+\geq \max\left\{2C_{\nabla^2 \ell} K_1,4C_\nu\sqrt{\frac{n}{s_1^2 n_y}} \right\} \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_1^2 s_2 \log p}{n}}.
+\end{equation}
+Applying Lemma \ref{lem:perturbation_bound} with Lemma \ref{lem:consistency1},
+\begin{equation}
+2 \|[ \hat\Hb_{n_y}(\hat\fattheta) - \hat\Hb_{n_y}(\fattheta^*) ] \fatomega_{n_y}^*\|_\infty \geq \lambda_2 / 2
+\end{equation}
+with probability at most
+\begin{equation}
+6\exp(-n \lambda_1^2 / C_1^2).
+\end{equation}
+By Lemma \ref{lem:Chernoff_bound},
+\begin{equation}
+2\|[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) ] \fatomega_{n_y}^*\|_\infty \geq \lambda_2 / 2
+\end{equation}
+with probability at most
+\begin{equation}
+2\exp\left( -\frac{\lambda_2^2 n_y}{C_2^2 (1+C_\omega \sqrt{\log p / n_y})^2 s_2}\right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{equation}
+Since
+\begin{multline}
+\{2 \|\nabla \ell_\text{de-bias}(\fatomega^*)\|_\infty \geq \lambda_2\} \\
+\subseteq \{2 \|[ \hat\Hb_{n_y}(\hat\fattheta) - \hat\Hb_{n_y}(\fattheta^*)] \fatomega^*\|_\infty
+\geq \lambda_2/2\} \cup \{2 \|[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) ] \fatomega^*\|_\infty \geq \lambda_2/2\},
+\end{multline}
+we have
+\begin{multline}
+\PP\left\{ 2 \|\nabla \ell_\text{de-bias}(\fatomega^*)\|_\infty \geq \lambda_2 \right\} \\
+\leq 6\exp\left( -\frac{\lambda_1^2 n}{C_1^2} \right) + 2\exp\left( -\frac{\lambda_2^2 n_y}{C_2^2 (1+C_\omega \sqrt{\log p / n_y})^2 s_2}\right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+\end{proof}
+
+\noindent
+By our choice of $\lambda_1 > 0$ and $\lambda_2 > 0$,
+\begin{equation}
+\PP\left\{ 2 \|\nabla \ell_\text{de-bias}(\fatomega^*)\|_\infty \geq \lambda_2 \right\}
+\leq 8/p + \exp( -n_y / 2(M_r - m_r)^2 ).
+\end{equation}
+
+\section{Technical Lemmas, Part 2}
+
+Assume a bounded density ratio model.
+
+To bound matrix-vector products of the form $\hat\Hb_{n_y}(\fattheta) \fatv$, first, decompose as
+\begin{equation}
+\hat\Hb_{n_y}(\hat\fattheta) \fatv
+= \underbrace{[ \hat\Hb_{n_y}(\hat\fattheta) - \hat\Hb_{n_y}(\fattheta^*) ] \fatv}_\text{(A)} + \underbrace{[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*)] \fatv}_\text{(B)} + \hat\Ib_{n_y}(\fattheta^*) \fatv,
+\end{equation}
+and control (A) and (B) separately.
+The bound for (A) is a direct consequence of the continuity of the Hessian $\nabla^2 \ell_\text{KLIEP}(\fattheta)$:
+See Lemma \ref{lem:perturbation_bound}.
+The bound for (B) results from combining the concentration of $\Hb_{n_y}(\fattheta^*)$ around $\Ib_{n_y}(\fattheta^*)$ with the concentration of $\hat r(\faty;\fattheta^*)$ around $r(\faty;\fattheta^*)$: See Lemma \ref{lem:Chernoff_bound}.
+
+\begin{lem} \label{lem:perturbation_bound}
+There exists $C_{\nabla^2 \ell} < \infty$ such that
+\begin{equation}
+\|\hat\Hb_{n_y}(\fattheta) - \hat\Hb_{n_y}(\fattheta^*)\|_\infty
+\leq C_{\nabla^2 \ell} \|\fattheta - \fattheta^*\|_1
+\quad \text{whenever} \quad \fattheta \in \mathcal{U}(\fattheta^*).
+\end{equation}
+\end{lem}
+
+\begin{proof}
+Let $(k,\ell)$ be an edge pair.
+We regard each $\fate_k^\top \hat\Hb_{n_y}(\,\cdot\,) \fate_\ell : \RR^p \to \RR$ as a continuous real function of $\fattheta$, and apply the mean value theorem.
+From (\ref{eq:3rdlKLIEP}) in Appendix \ref{app:3rdlKLIEP},
+\begin{multline}
+\nabla \left[ \fate_k^\top \hat\Hb_{n_y}(\fattheta) \fate_\ell \right]
+= \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')})\right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \\
+\times \sum_{j'' \neq j, j'} \left( \fatpsi(\faty^{(j)}) + \fatpsi(\faty^{(j')}) - 2\fatpsi(\faty^{(j'')}) \right) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \hat r(\faty^{(j'')};\fattheta).
+\end{multline}
+By the mean value theorem, there exists $t \in [0,1]$ such that $\bar\fattheta = \fattheta^* - t(\fattheta - \fattheta^*)$, and
+\begin{multline}
+\fate_k^\top \left[ \hat\Hb_{n_y}(\fattheta) - \hat\Hb_{n_y}(\fattheta^*) \right] \fate_\ell
+= \frac{1}{n_y^3} \sum_{1\leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')})\right) \\
+\times \sum_{j'' \neq j, j'} \left\langle \fatpsi(\faty^{(j)}) + \fatpsi(\faty^{(j')}) - 2\fatpsi(\faty^{(j'')}),\fattheta - \fattheta^* \right\rangle \hat r(\faty^{(j)};\bar\fattheta) \hat r(\faty^{(j')};\bar\fattheta) \hat r(\faty^{(j'')};\bar\fattheta).
+\end{multline}
+Thus,
+\begin{equation}
+\begin{aligned}
+\Big| \fate_k^\top & \Big[ \hat\Hb_{n_y}(\fattheta) - \hat\Hb_{n_y}(\fattheta^*) \Big] \fate_\ell \Big| \\
+\leq & \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} \left| \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right| \left| \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right| \\
+&\times \sum_{j'' \neq j, j'} \left| \left\langle \fatpsi(\faty^{(j)}) + \fatpsi(\faty^{(j')}) - 2\fatpsi(\faty^{(j'')}),\fattheta - \fattheta^* \right\rangle \right| \hat r(\faty^{(j)};\bar\fattheta) \hat r(\faty^{(j')};\bar\fattheta) \hat r(\faty^{(j'')};\bar\fattheta) \\
+\leq & \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} \left|\psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right| \left|\psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right| \\
+&\times \sum_{j'' \neq j, j'} \left\| \fatpsi(\faty^{(j)}) + \fatpsi(\faty^{(j')}) - 2\fatpsi(\faty^{(j'')}) \right\|_\infty \left\| \fattheta-\fattheta^* \right\|_1 \hat r(\faty^{(j)};\bar\fattheta) \hat r(\faty^{(j')};\bar\fattheta) \hat r(\faty^{(j'')};\bar\fattheta) \\
+\leq & \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} 4 M_\psi^2 \sum_{j'' \neq j, j'} \frac{4 M_\psi M_r^3}{m_r^3} \|\fattheta - \fattheta^*\|_1 \\
+\leq & \frac{8 M_\psi^3 M_r^3}{m_r^3} \|\fattheta - \fattheta^*\|_1,
+\end{aligned}
+\end{equation}
+where the second inequality is by Cauchy-Schwarz.
+Since this is true for all $(k,\ell)$,
+\begin{equation}
+\|\hat\Hb_{n_y}(\fattheta) - \hat\Hb_{n_y}(\fattheta^*)\|_\infty
+= \max_{k,\ell} \left| \fate_k^\top \left[ \hat\Hb_{n_y}(\fattheta) - \hat\Hb_{n_y}(\fattheta^*) \right] \fate_\ell \right|
+\leq \frac{8 M_\psi^3 M_r^3}{m_r^3} \|\fattheta - \fattheta^*\|_1.
+\end{equation}
+\end{proof}
+
+\begin{lem} \label{lem:subG_quadform}
+For any $\fatu, \fatv \in \RR^p$ with $\|\fatu\|_1=\|\fatv\|_1=1$,
+\begin{equation}
+\EE_y \left[ \exp\left( t\cdot \fatu^\top \left[ \Hb_{n_y}(\fattheta^*)-\Ib_{n_y}(\fattheta^*) \right] \fatv \right) \right]
+\leq \exp(4 M_\psi^4 M_r^4 t^2 / n_y) \quad \forall \, t > 0.
+\end{equation}
+\end{lem}
+
+\begin{proof}
+Define
+\begin{equation}
+U
+:= \frac{2}{1-1/n_y} \fatu^\top \Hb_{n_y}(\fattheta^*) \fatv
+= \frac{2}{n_y(n_y-1)} \sum_{1 \leq j < j' \leq n_y} g(\faty^{(j)},\faty^{(j')}),
+\end{equation}
+where
+\begin{equation}
+g(\faty,\faty')
+= \langle \fatpsi(\faty) - \fatpsi(\faty'),\fatu \rangle \langle\fatpsi(\faty) - \fatpsi(\faty'),\fatv\rangle r(\faty;\fattheta^*) r(\faty';\fattheta^*).
+\end{equation}
+Let
+\begin{equation}
+V(\faty^{(1)},\dots,\faty^{(n_y)})
+:= \frac{1}{\lfloor n_y/2\rfloor} \left( g(\faty^{(1)},\faty^{(2)}) + g(\faty^{(3)},\faty^{(4)}) + \cdots + g(\faty^{(2\lfloor n_y/2\rfloor-1)},\faty^{(2\lfloor n_y/2\rfloor)}) \right).
+\end{equation}
+Using the definitions, we may write
+\begin{equation}
+U
+= \frac{1}{n_y!} \sum_{\sigma \in \mathfrak{S}^{n_y}} V(\faty^{(\sigma(1))},\dots,\faty^{(\sigma(n_y))}),
+\end{equation}
+where $\mathfrak{S}^{n_y}$ is the group of permutations of $[n_y]$.
+For any $t>0$,
+\begin{equation}
+\begin{aligned}
+& \EE_y \left[ \exp\left( t\cdot \fatu^\top \left[ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) \right] \fatv \right) \right] \\
+&= \EE_y \left[ \exp\left( \frac{1-1/n_y}{2} \, t \cdot \left( U - \EE_y U \right) \right) \right] \\
+&= \EE_y \left[ \exp\left( \frac{1-1/n_y}{2} \, t \cdot \frac{1}{n_y!} \left( \sum_{\sigma \in \mathfrak{S}^{n_y}} \left( V(\faty^{(\sigma(1))},\dots,\faty^{(\sigma(n_y))}) - \EE_y \left[ V(\faty^{(\sigma(1))},\dots,\faty^{(\sigma(n_y))}) \right] \right) \right) \right) \right] \\
+&\leq \frac{1}{n_y!} \sum_{\sigma \in \mathfrak{S}^{n_y}} \EE_y \left[ \exp\left( \frac{1-1/n_y}{2} t \cdot \left( V(\faty^{(\sigma(1))},\dots,\faty^{(\sigma(n_y))}) - \EE\left[ V(\faty^{(\sigma(1))},\dots,\faty^{(\sigma(n_y))}) \right] \right) \right) \right] \\
+&\leq \exp(4 M_\psi^4 M_r^4 t^2 / n_y).
+\end{aligned}
+\end{equation}
+The second-to-last inequality uses Jensen.
+The last inequality uses Lemma \ref{lem:subGV} to follow.
+\end{proof}
+
+\begin{lem} \label{lem:subGV}
+For $V(\faty^{(1)},\dots,\faty^{(n_y)})$ occurring in the proof of Lemma \ref{lem:subG_quadform},
+\begin{equation}
+\EE_y \left[ \exp\left( t\cdot\left(V(\faty^{(1)},\dots,\faty^{(n_y)})-\EE\left[ V(\faty^{(1)},\dots,\faty^{(n_y)}) \right] \right) \right) \right]
+\leq \exp(16 M_\psi^4 M_r^4 t^2 / n_y) \quad \forall \, t > 0.
+\end{equation}
+\end{lem}
+
+\begin{proof}
+Consider a random variable $G$ with $|G|\leq D$ and $\EE G=g$.
+Using the convexity of the exponential function,
+\begin{equation}
+e^{tG} \leq \frac{D-G}{2D} e^{-Dt} + \frac{G+D}{2D} e^{Dt},
+\end{equation}
+so that
+\begin{equation}
+\begin{aligned}
+\EE[ e^{t(G-g)} ]
+&\leq e^{-tg} \frac{(D-g) e^{-Dt} + (D+g) e^{Dt}}{2D} \\
+&= e^{-tg} \frac{e^{-Dt} (D - g + (D + g) e^{2Dt})}{2D} \\
+&=\exp\left( -(D+g) t + \log\left( 1 - \frac{D+g}{2D} + \frac{D+g}{2D} e^{2Dt} \right) \right).
+\end{aligned}
+\end{equation}
+Put $\tilde t = 2Dt$ and $p = (D+g) / 2D$, and write
+\begin{equation}
+h(\tilde t) = -p \tilde t + \log(1 - p + pe^{\tilde t}).
+\end{equation}
+Then,
+\begin{equation}
+h'(\tilde t) = -p + \frac{p e^{\tilde t}}{1 - p + p e^{\tilde t}}
+\end{equation}
+and
+\begin{equation}
+h''(\tilde t)
+= \frac{(1-p) p e^{\tilde t}}{(1 - p + p e^{\tilde t})^2}
+= \left( \frac{p e^{\tilde t}}{1 - p + p e^{\tilde t}} \right) \left( 1 - \frac{p e^{\tilde t}}{1 - p + p e^{\tilde t}} \right)
+\leq \frac{1}{4},
+\end{equation}
+since $p \exp(\tilde t) / (1 - p + p \exp(\tilde t)) \in (0,1)$.
+By Taylor's Theorem,
+\begin{equation}
+h(\tilde t) \leq h(0) + h'(0) \tilde t + \frac{1}{8} \tilde t^2 = \frac{1}{8} \tilde t^2,
+\end{equation}
+so that
+\begin{equation} \label{ineq:mgf_bdd_rv}
+\EE[e^{t(G-g)}] \leq e^{D^2t^2/2}.
+\end{equation}
+Now, $g(\faty^{(j)},\faty^{(j')})$'s occurring in $V(\faty^{(1)},\dots\faty^{(n_y)})$ are i.i.d.~with
+\begin{multline}
+|g(\faty^{(j)},\faty^{(j')})|
+= \left| \left\langle \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}),\fatu \right\rangle \left\langle \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}),\fatv \right\rangle r(\faty^{(j)};\fattheta^*) r(\faty^{(j')};\fattheta^*) \right| \\
+\leq \left\| \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right\|_\infty^2 r(\faty^{(j)};\fattheta^*) r(\faty^{(j')};\fattheta^*)
+\leq 4 M_\psi^2 M_r^2,
+\end{multline}
+where the second-to-last inequality is by Cauchy-Schwarz with the assumptions on $\fatu$ and $\fatv$.
+Applying (\ref{ineq:mgf_bdd_rv}) to the random variable $g(\faty^{(1)},\faty^{(2)})$,
+\begin{equation}
+\EE_y \left[ \exp\left( \frac{t}{\lfloor n_y/2 \rfloor}\cdot\left(g(\faty^{(1)},\faty^{(2)}) - \EE_y \left[ g(\faty^{(1)},\faty^{(2)}) \right] \right) \right) \right]
+\leq \exp(32 M_\psi^4 M_r^4 t^2 / n_y^2).
+\end{equation}
+By independence,
+\begin{multline}
+\EE_y \left[ \exp\left( t \cdot \left( V(\faty^{(1)},\dots,\faty^{(n_y)}) - \EE_y \left[ V(\faty^{(1)},\dots,\faty^{(n_y)}) \right] \right) \right) \right] \\
+= \EE_y \left[ \exp\left( \frac{t}{\lfloor n_y/2 \rfloor} \cdot \left( g(\faty^{(1)},\faty^{(2)}) - \EE_y \left[ g(\faty^{(1)},\faty^{(2)}) \right] \right) \right) \right]^{\lfloor n_y/2 \rfloor}
+\leq \exp(16 M_\psi^4 M_r^4 t^2 / n_y).
+\end{multline}
+\end{proof}
+
+\begin{lem} \label{lem:Chernoff_bound}
+For any $\fatv \in \RR^p$, if
+\begin{equation}
+t \geq 32\sqrt{2} M_\psi^2 M_r^2 \|\fatv\|_1 \sqrt{\frac{\log p}{n_y}},
+\end{equation}
+then
+\begin{multline}
+\PP\left\{ 2 \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \right\} \\
+\leq 2\exp\left( -\frac{t^2 n_y}{2048 M_\psi^4 M_r^4 \|\fatv\|_1^2} \right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+If, in addition, Assumptions \ref{hyp:sparsity} and \ref{hyp:invertibility} are true, then there exists $C_\nu > 0$ such that if
+\begin{equation}
+\lambda_2 \geq C_\nu \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_2 \log p}{n_y}},
+\end{equation}
+then
+\begin{multline}
+\PP\left\{ \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatomega_{n_y}^* \right\|_\infty \geq \lambda_2 \right\} \\
+\leq 2\exp\left( -\frac{\lambda_2^2 n_y}{C_\nu^2 (1+C_\omega \sqrt{\log p / n_y})^2 s_2}\right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+\end{lem}
+
+\begin{proof}
+Fix $\varepsilon \in (0,1)$, and let $\mathcal{A}$ be the event
+\begin{equation}
+\mathcal{A}
+:= \left\{ \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} > 1-\varepsilon \right\}.
+\end{equation}
+Conditional on $\mathcal{A}$, for any $k \in [p]$,
+\begin{equation}
+\begin{aligned}
+\{ \fate_k^\top & [ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) ] \fatv \geq (1-\varepsilon)^2 t \mid \mathcal{A} \} \\
+&= \left\{ \left. \fate_k^\top \left[ \frac{\hat Z^2(\fattheta^*)}{Z^2(\fattheta^*)} \hat\Hb_{n_y}(\fattheta^*) - \EE_y \left[ \frac{\hat Z^2(\fattheta^*)}{Z^2(\fattheta^*)} \hat\Hb_{n_y}(\fattheta^*) \right] \right] \fatv \geq (1-\varepsilon)^2 t \ \right\vert \mathcal{A} \right\} \\
+&\supseteq \left\{ \left. (1-\varepsilon)^2 \cdot \fate_k^\top [ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) ]\fatv \geq (1-\varepsilon)^2 t \ \right\vert \mathcal{A} \right\} \\
+&= \left\{ \left. \fate_k^\top [ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) ]\fatv \geq t \ \right\vert \mathcal{A} \right\}.
+\end{aligned}
+\end{equation}
+We have
+\begin{equation}
+\begin{aligned}
+\PP \Big\{ \fate_k^\top [ \hat\Hb_{n_y}(\fattheta^*) &- \hat\Ib_{n_y}(\fattheta^*) ] \fatv \geq t \ \Big\vert \mathcal{A} \Big\} \\
+&\leq \PP\left\{ \fate_k^\top [ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) ] \fatv \geq (1-\varepsilon)^2 t \mid \mathcal{A} \right\} \\
+&\leq \PP\left\{ \|\fatv\|_1 a \cdot \fate_k^\top [ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) ] (\fatv / \|\fatv\|_1) \geq (1-\varepsilon)^2 a t \mid \mathcal{A} \right\} \\
+&\leq \PP\left\{ \exp\left( \|\fatv\|_1 a \cdot \fate_k^\top \left[ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) \right] (\fatv / \|\fatv\|_1) \right) \geq \exp((1-\varepsilon)^2 a t) \mid \mathcal{A} \right\} \\
+&\leq e^{-(1-\varepsilon)^2 a t} \, \EE_y \left[ \exp\left( \|\fatv\|_1 a \cdot \fate_k^\top \left[ \Hb_{n_y}(\fattheta^*) - \Ib_{n_y}(\fattheta^*) \right] (\fatv / \|\fatv\|_1) \right) \right] \\
+&\leq \exp\left( -(1-\varepsilon)^2 a t + 4 M_\psi^4 M_r^4 \|\fatv\|_1^2 a^2 / n_y \right),
+\end{aligned}
+\end{equation}
+where in the last line, we have used Lemma \ref{lem:subG_quadform}.
+Setting $a = (1-\varepsilon)^2 t n_y / (8 M_\psi^4 M_r^4 \|\fatv\|_1^2)$, the minimizer of the last expression,
+\begin{equation}
+\PP\left\{ \left. \fate_k^\top \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \geq t \ \right\vert \mathcal{A} \right\}
+\leq \exp\left( -\frac{(1-\varepsilon)^4 t^2 n_y}{16 M_\psi^4 M_r^4 \|\fatv\|_1^2} \right).
+\end{equation}
+By a similar argument,
+\begin{equation}
+\PP\left\{ \left. \left| \fate_k^\top \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right| \geq t \ \right\vert \mathcal{A} \right\}
+\leq 2\exp\left( -\frac{(1-\varepsilon)^4 t^2 n_y}{16 M_\psi^4 M_r^4 \|\fatv\|_1^2} \right).
+\end{equation}
+Taking the union bound over all edges,
+\begin{equation}
+\PP\left\{ \left. \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \ \right\vert \mathcal{A} \right\}
+\leq 2\exp\left( -\frac{(1-\varepsilon)^4 t^2 n_y}{16 M_\psi^4 M_r^4 \|\fatv\|_1^2} + \log p \right).
+\end{equation}
+Now,
+\begin{equation}
+\PP(\mathcal{A}^c)
+= \PP\left\{ \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} - 1 \leq -\varepsilon \right\}
+= \exp\left( -\frac{2 \varepsilon^2 n_y}{(M_r - m_r)^2} \right)
+\end{equation}
+by Lemma \ref{lem:Hoeffding_r}.
+Thus,
+\begin{multline}
+\PP\left\{ \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \right\} \\
+\leq \PP\left\{ \left. \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \ \right\vert \mathcal{A} \right\} + \PP(\mathcal{A}^c) \\
+\leq 2\exp\left( -\frac{(1-\varepsilon)^4 t^2 n_y}{16 M_\psi^4 M_r^4 \|\fatv\|_1^2} + \log p \right) + \exp\left( -\frac{2 \varepsilon^2 n_y}{(M_r - m_r)^2} \right).
+\end{multline}
+Choose $\varepsilon = 1/2$.
+Then,
+\begin{multline}
+\PP\left\{ \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \right\} \\
+\leq 2\exp\left( -\frac{t^2 n_y}{256 M_\psi^4 M_r^4 \|\fatv\|_1^2} + \log p \right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+Thus, if
+\begin{equation}
+t \geq 32\sqrt{2} M_\psi^2 M_r^2 \|\fatv\|_1 \sqrt{\frac{\log p}{n_y}},
+\end{equation}
+then
+\begin{multline}
+\PP\left\{ 2 \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatv \right\|_\infty \geq t \right\} \\
+\leq 2\exp\left( -\frac{t^2 n_y}{2048 M_\psi^4 M_r^4 \|\fatv\|_1^2} \right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right).
+\end{multline}
+Finally, Assumptions \ref{hyp:sparsity} and \ref{hyp:invertibility} imply
+\begin{equation}
+\|\fatomega_{n_y}^*\|_1
+\leq \left( 1 + C_\omega \sqrt{\frac{\log p}{n_y}} \right) \frac{\sqrt{s_2}}{\lambda_{\min}}
+\end{equation}
+so that
+\begin{multline}
+\PP\left\{ \left\| \left[ \hat\Hb_{n_y}(\fattheta^*) - \hat\Ib_{n_y}(\fattheta^*) \right] \fatomega_{n_y}^* \right\|_\infty \geq \lambda_2 \right\} \\
+\leq 2\exp\left( -\frac{\lambda_2^2 n_y}{C_\nu^2 (1+C_\omega \sqrt{\log p / n_y})^2 s_2}\right) + \exp\left( -\frac{n_y}{2(M_r - m_r)^2} \right),
+\end{multline}
+where $C_\nu = 32\sqrt{2} M_\psi^2 M_r^2 / \lambda_{\min}$.
+\end{proof}
+
+\section{Concentration Bounds}
+
+Assume a bounded density ratio model.
+Regardless of the existence of the bound on $r(\faty;\fattheta)$, in general,
+\begin{equation}
+\frac{\hat Z(\fattheta)}{Z(\fattheta)}
+= \frac{1}{n_y} \sum_{j=1}^{n_y} \frac{\exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right)}{Z(\fattheta)}
+= \frac{1}{n_y} \sum_{j=1}^{n_y} r(\faty^{(j)};\fattheta),
+\end{equation}
+and
+\begin{equation}
+\EE_y[r(\faty;\fattheta)]
+= \int r(\faty;\fattheta) f_y(\faty) \, d\faty
+= \int f(\faty;\fattheta+\fateta_y) \, d\faty
+= 1.
+\end{equation}
+When $r(\faty;\fattheta)$ is bounded, Lemma \ref{lem:Hoeffding_r} and Lemma \ref{lem:Hoeffding_psi_r} are immediate from Hoeffding's inequality.
+
+\begin{lem} \label{lem:Hoeffding_r}
+For any $t > 0$,0
+\begin{align*}
+\PP\left\{ \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} - 1 \geq \phantom{-}t \right\}
+= \PP\left\{ \frac{1}{n_y} \sum_{j=1}^{n_y} r(\faty^{(j)};\fattheta^*) - 1 \geq \phantom{-}t \right\}
+&\leq \exp\left( -\frac{2 t^2 n_y}{(M_r - m_r)^2} \right)
+\intertext{and}
+\PP\left\{ \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} - 1 \leq -t \right\}
+= \PP\left\{ \frac{1}{n_y} \sum_{j=1}^{n_y} r(\faty^{(j)};\fattheta^*) - 1 \leq -t \right\}
+&\leq \exp\left( -\frac{2 t^2 n_y}{(M_r - m_r)^2} \right).
+\end{align*}
+\end{lem}
+
+\begin{proof}
+Apply Hoeffding's inequality to the bounded random variable $m_r \leq r(\faty;\fattheta^*) \leq M_r$, $\EE_y[r(\faty;\fattheta^*)] = 1$.
+\end{proof}
+
+\begin{lem} \label{lem:Hoeffding_psi_rhat_minus_r}
+For each $k \in [p]$, for any $t > 0$,
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right| \geq t \right\} \\
+\leq 2\exp\left( -\frac{2 m_r^2 t^2 n_y}{M_\psi^2 M_r^2 (M_r - m_r)^2} \right).
+\end{equation}
+\end{lem}
+
+\begin{proof}
+Since
+\begin{equation}
+\begin{aligned}
+\psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right)
+&= \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \left( 1 - \frac{r(\faty^{(j)};\fattheta^*)}{\hat r(\faty^{(j)};\fattheta^*)} \right) \\
+&= \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \left( 1 - \frac{Z(\fattheta^*)^{-1} \exp\left( \fattheta^{*\top} \fatpsi(\faty^{(j)} \right)}{\hat Z(\fattheta^*)^{-1} \exp\left( \fattheta^{*\top} \fatpsi(\faty^{(j)} \right)} \right) \\
+&= \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \left( 1 - \frac{\hat Z(\fattheta^*)}{Z(\fattheta^*)} \right) \\
+&= \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \left( 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right),
+\end{aligned}
+\end{equation}
+we have
+\begin{multline}
+\left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right| \\
+= \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)})\hat r(\faty^{(j)};\fattheta^*) \left( 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right) \right| \\
+= \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)})\hat r(\faty^{(j)};\fattheta^*) \right| \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \\
+\leq \frac{M_\psi M_r}{m_r} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right|.
+\end{multline}
+But Lemma \ref{lem:Hoeffding_r} implies
+\begin{equation}
+\PP\left\{ \frac{M_\psi M_r}{m_r} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 t^2 n_y}{M_\psi^2 M_r^2 (M_r - m_r)^2} \right).
+\end{equation}
+Thus, for any $t > 0$,
+\begin{multline}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) -  r(\faty^{(j)};\fattheta^*) \right) \right| \geq t \right\} \\
+\leq \PP\left\{ \frac{M_\psi M_r}{m_r} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 t^2 n_y}{M_\psi^2 M_r^2 (M_r - m_r)^2} \right).
+\end{multline}
+\end{proof}
+
+\begin{lem} \label{lem:Hoeffding_dot_psi_r}
+For each $\fatv \in \RR^p$ and $\sigma > 0$, for any $t > 0$,
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \langle \fatv, \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) - \fatmu \rangle \right| \geq t \right\}
+\leq 2\exp\left( -\frac{\sigma^2 t^2 n_y}{2 M_\psi^2 M_r^2 \|\fatv\|_1^2} \right).
+\end{equation}
+\end{lem}
+
+\begin{proof}
+\begin{equation}
+\left| \sigma^{-1} \langle \fatv, \fatpsi(\faty^{(j)}) r(\faty^{(j)};\fattheta^*) \rangle \right|
+\leq \sigma^{-1} \|\fatv\|_1 \|\fatpsi(\faty^{(j)})\|_\infty r(\faty^{(j)};\fattheta^*)
+\leq \sigma^{-1} M_\psi M_r \|\fatv\|_1.
+\end{equation}
+\end{proof}
+
+\begin{lem} \label{lem:Hoeffding_dot_psi_rhat_minus_r}
+For each $\fatv \in \RR^p$ and $\sigma > 0$, for any $t > 0$,
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \left\langle \fatv, \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right\rangle \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 \sigma^2 t^2 n_y}{M_\psi^2 M_r^2 \|\fatv\|_1^2} \right).
+\end{equation}
+\end{lem}
+
+\begin{proof}
+As in the proof of Lemma \ref{lem:Hoeffding_psi_rhat_minus_r},
+\begin{equation}
+\begin{aligned}
+\Big| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \big\langle \fatv, \fatpsi(\faty^{(j)}) & \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \big\rangle \Big| \\
+&= \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \left\langle \fatv, \fatpsi(\faty^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \right\rangle \left( 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right) \right| \\
+&= \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \left\langle \fatv, \fatpsi(\faty^{(j)}) \hat r(\faty^{(j)};\fattheta^*) \right\rangle \right| \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \\
+&\leq \frac{\|\fatv\|_1 \|\fatpsi(\faty^{(j)})\|_\infty \hat r(\faty^{(j)};\fattheta^*)}{\sigma} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \\
+&\leq \frac{M_\psi M_r \|\fatv\|_1}{m_r \sigma} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right|.
+\end{aligned}
+\end{equation}
+As before,
+\begin{equation}
+\PP\left\{ \frac{M_\psi M_r \|\fatv\|_1}{m_r \sigma} \left| 1 - \frac{1}{n_y} \sum_{j'=1}^{n_y} r(\faty^{(j')};\fattheta^*) \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 \sigma^2 t^2 n_y}{M_\psi^2 M_r^2 \|\fatv\|_1^2} \right)
+\end{equation}
+by Lemma \ref{lem:Hoeffding_r}.
+Thus, for any $t > 0$,
+\begin{equation}
+\PP\left\{ \left| \frac{1}{n_y} \sum_{j=1}^{n_y} \sigma^{-1} \left\langle \fatv, \fatpsi(\faty^{(j)}) \left( \hat r(\faty^{(j)};\fattheta^*) - r(\faty^{(j)};\fattheta^*) \right) \right\rangle \right| \geq t \right\}
+\leq 2\exp\left( -\frac{2 m_r^2 \sigma^2 t^2 n_y}{M_\psi^2 M_r^2 \|\fatv\|_1^2} \right).
+\end{equation}
+\end{proof}
+
+\section{The Empirical KLIEP Loss}
+
+Recall
+\begin{equation}
+\begin{aligned}
+\partial_k &= \frac{\partial}{\partial\theta_k}, &
+\partial^2_{k\ell} &= \frac{\partial^2}{\partial\theta_k \partial\theta_\ell}, &
+\partial^3_{k'k\ell} &= \frac{\partial^3}{\partial\theta_{k'} \partial\theta_k \partial\theta_\ell}.
+\end{aligned}
+\end{equation}
+
+\subsection{The Gradient of the Empirical Ratio Estimate}
+
+\begin{equation}
+\begin{aligned}
+\partial_k \hat r(\faty;\fattheta_k)
+&= \partial_k \left[ \frac{\exp\left( \fattheta^\top \fatpsi(\faty) \right)}{\hat Z(\fattheta)} \right] \\
+&= \frac{1}{\hat Z(\fattheta)^2} \left[ \psi_k(\faty_k) \exp\left( \fattheta^\top \fatpsi(\faty) \right)\hat Z(\fattheta) - \exp\left( \fattheta^\top \fatpsi(\faty) \right) \cdot \frac{1}{n_y} \sum_{j'=1}^{n_y} \psi_k(\faty_k^{(j')}) \exp\left( \fattheta^\top \fatpsi(\faty^{(j')}) \right) \right] \\
+&= \frac{\exp\left( \fattheta^\top \fatpsi(\faty) \right)}{\hat Z(\fattheta)^2} \left[ \psi_k(\faty_k) \cdot \frac{1}{n_y} \sum_{j'=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j')}) \right) - \frac{1}{n_y}\sum_{j'=1}^{n_y} \psi_k(\faty_k^{(j')}) \exp\left( \fattheta^\top \fatpsi(\faty^{(j')}) \right) \right] \\
+&= \frac{\exp\left( \fattheta^\top \fatpsi(\faty) \right)}{\hat Z(\fattheta)^2} \left[ \frac{1}{n_y}\sum_{j'=1}^{n_y} \left( \psi_k(\faty_k) - \psi_k(\faty_k^{(j')}) \right) \exp\left( \fattheta^\top \fatpsi(\faty^{(j')}) \right) \right] \\
+&= \frac{1}{n_y} \sum_{j'=1}^{n_y} \left( \psi_k(\faty_k) - \psi_k(\faty_k^{(j')}) \right) \hat r(\faty;\fattheta) \, \hat r(\faty^{(j')};\fattheta).
+\end{aligned}
+\end{equation}
+
+\subsection{The Gradient of the Empirical KLIEP Loss}
+
+\begin{equation} \label{eq:gradlKLIEP}
+\begin{aligned}
+\partial_k \ell_\text{KLIEP}(\fattheta)
+&= \partial_k \left[ -\frac{1}{n} \sum_{i=1}^{n} \fattheta^\top \fatpsi(\fatx^{(i)}) + \log\left( \frac{1}{n_y} \sum_{j=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \right) \right] \\
+&= -\frac{1}{n} \sum_{i=1}^{n} \psi_k(\fatx_k^{(i)}) + \left( \frac{1}{n_y} \sum_{j=1}^{n_y} \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \right)^{-1} \cdot \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \exp\left( \fattheta^\top \fatpsi(\faty^{(j)}) \right) \\
+&= -\frac{1}{n} \sum_{i=1}^{n} \psi_k(\fatx_k^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_k(\faty_k^{(j)}) \hat r(\faty^{(j)};\fattheta).
+\end{aligned}
+\end{equation}
+
+\subsection{The Hessian of the Empirical KLIEP Loss} \label{app:HlKLIEP}
+
+\begin{equation}
+\begin{aligned}
+\partial^2_{k\ell} \ell_\text{KLIEP}(\fattheta)
+&= \partial_k \left[ -\frac{1}{n} \sum_{i=1}^{n} \psi_\ell(\fatx_\ell^{(i)}) + \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_\ell(\faty_\ell^{(j)}) \hat r(\faty^{(j)};\fattheta) \right] \\
+&= \frac{1}{n_y} \sum_{j=1}^{n_y} \psi_\ell(\faty_\ell^{(j)}) \, \partial_k \hat r(\faty^{(j)};\fattheta) \\
+&= \frac{1}{n_y}\sum_{j=1}^{n_y} \left[ \psi_\ell(\faty_\ell^{(j)}) \cdot \frac{1}{n_y} \sum_{j'=1}^{n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')}; \fattheta) \right] \\
+&= \frac{1}{n_y^2} \sum_{j=1}^{n_y} \sum_{j'=1}^{n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\psi_\ell(\faty_\ell^{(j)}) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta).
+\end{aligned}
+\end{equation}
+Now, when $j=j'$,
+\begin{equation}
+\left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right) \psi_\ell(\faty_\ell^{(j)}) = 0,
+\end{equation}
+so that only the terms with $j \neq j'$ contribute.
+For each distinct pair $j \neq j'$, there are two terms.
+So, combining them yields
+\begin{multline}
+\left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right) \psi_\ell(\faty_\ell^{(j)}) + \left( \psi_k(\faty_k^{(j')}) - \psi_k(\faty_k^{(j)}) \right) \psi_\ell(\faty_\ell^{(j')}) \\
+= \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right) \left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right).
+\end{multline}
+Finally,
+\begin{equation} \label{eq:HlKLIEP}
+\partial^2_{k\ell} \ell_\text{KLIEP}(\fattheta)
+= \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta).
+\end{equation}
+
+\subsection{Third-Order Derivatives} \label{app:3rdlKLIEP}
+
+\begin{equation}
+\begin{aligned}
+& \partial^3_{k'k\ell} \ell_\text{KLIEP}(\fattheta) \\
+&= \partial_{k'} \left[ \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \right] \\
+&= \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \partial_{k'} \left[ \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \right] \\
+&= \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \\
+&\quad\quad \times \sum_{j''=1}^{n_y} \left[ \left( \psi_{k'}(\faty_{k'}^{(j)}) - \psi_{k'}(\faty_{k'}^{(j'')}) \right) + \left( \psi_{k'}(\faty_{k'}^{(j')}) - \psi_{k'}(\faty_{k'}^{(j'')}) \right) \right] \hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \hat r(\faty^{(j'')};\fattheta).
+\end{aligned}
+\end{equation}
+Consider the case $j'' = j$ or $j'$.
+When $j = j'' < j$, the summand is
+\begin{equation}
+-\left( \psi_{k'}(\faty_{k'}^{(j)}) - \psi_{k'}(\faty_{k'}^{(j')}) \right) \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right).
+\end{equation}
+When $j < j' = j''$, the summand is
+\begin{equation}
+\left( \psi_{k'}(\faty_{k'}^{(j)}) - \psi_{k'}(\faty_{k'}^{(j')}) \right) \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right).
+\end{equation}
+Thus, only the terms with distinct indices contribute to the sum, and we have
+\begin{equation} \label{eq:3rdlKLIEP}
+\begin{aligned}
+\partial^3_{k'k\ell} \ell_\text{KLIEP}(\fattheta) \\
+= \frac{1}{n_y^3} \sum_{1 \leq j < j' \leq n_y} & \left( \psi_k(\faty_k^{(j)}) - \psi_k(\faty_k^{(j')}) \right)\left( \psi_\ell(\faty_\ell^{(j)}) - \psi_\ell(\faty_\ell^{(j')}) \right) \\
+\times \sum_{j'' \neq j, j'} & \left( \psi_{k'}(\faty_{k'}^{(j)}) + \psi_{k'}(\faty_{k'}^{(j')}) - 2\psi_{k'}(\faty_{k'}^{(j'')}) \right)\hat r(\faty^{(j)};\fattheta) \hat r(\faty^{(j')};\fattheta) \hat r(\faty^{(j'')};\fattheta).
+\end{aligned}
+\end{equation}
+
+Recall that at $\fattheta=\fattheta^*$, we have $f_x(\faty)= r(\faty;\fattheta^*) f_y(\faty)$.
+For $\faty \indep \faty' \sim f_y$.
+\begin{equation}
+\begin{aligned}
+& \EE_{\faty,\faty'}[ (\psi_k(\faty_k) - \psi_k(\faty_k')) (\psi_\ell(\faty_\ell) - \psi_\ell(\faty_\ell')) r(\faty;\fattheta^*) r(\faty';\fattheta^*) ] \\
+&= \iint (\psi_k(\faty_k) - \psi_k(\faty_k')) (\psi_\ell(\faty_\ell) - \psi_\ell(\faty_\ell')) r(\faty;\fattheta^*) r(\faty';\fattheta^*) f_y(\faty) f_y(\faty') \, d\faty \, d\faty' \\
+&= \iint \Big( \psi_k(\faty_k)\psi_\ell(\faty_\ell) + \psi_k(\faty_k')\psi_\ell(\faty_\ell') - \psi_k(\faty_k)\psi_\ell(\faty_\ell') - \psi_k(\faty_k')\psi_\ell(\faty_\ell) \Big) f_x(\faty) f_x(\faty') \, d\faty \, d\faty' \\
+&= \EE_x[\psi_k(\faty_k)\psi_\ell(\faty_\ell)] + \EE_x[\psi_k(\faty_k')\psi_\ell(\faty_\ell')] - \EE_x[\psi_k(\faty_k)]\EE_x[\psi_\ell(\faty_\ell')] - \EE_x[\psi_k(\faty_k')]\EE_x[\psi_\ell(\faty_\ell)] \\
+&= \EE_x[\psi_k(\faty_k)\psi_\ell(\faty_\ell)] + \EE_x[\psi_k(\faty_k)\psi_\ell(\faty_\ell)] - \EE_x[\psi_k(\faty_k)]\EE_x[\psi_\ell(\faty_\ell)] - \EE_x[\psi_k(\faty_k)]\EE_x[\psi_\ell(\faty_\ell)] \\
+&= 2\EE_x[\psi_k(\faty_k)\psi_\ell(\faty_\ell)] - 2\EE_x[\psi_k(\faty_k)]\EE_x[\psi_\ell(\faty_\ell)] \\
+&= 2\Cov_{\fatx}[\psi_k(\faty_k),\psi_\ell(\faty_\ell)].
+\end{aligned}
+\end{equation}
+So,
+\begin{multline} \label{eq:EyH}
+\Ib_{n_y}(\fattheta^*)
+= \EE\left[ \Hb_{n_y}(\fattheta^*) \right] \\
+= \EE\left[ \frac{1}{n_y^2} \sum_{1 \leq j < j' \leq n_y} \left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right)\left( \fatpsi(\faty^{(j)}) - \fatpsi(\faty^{(j')}) \right) r(\faty^{(j)};\fattheta) r(\faty^{(j')};\fattheta) \right] \\
+= \frac{1}{n_y^2} \frac{n_y(n_y-1)}{2} \cdot 2\fatSigma
+= (1-1/n_y) \fatSigma.
+\end{multline}
 
 \end{document}
