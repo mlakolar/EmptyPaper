@@ -763,7 +763,7 @@ When $\supp(\fatv^*) \not\subseteq S$, $\|\fatv_{S^c}^*\|_1 > 0$, and we have in
 \leq 4\sqrt{|S|}\|\fatv\| + 4\|\fatv_{S^c}^*\|_1.
 \end{equation}
 
-\begin{prop}
+\begin{prop} \label{prop:rsc}
 Let $\fattheta \in \mathcal{U}(\fattheta^*)$.
 Let
 \begin{equation}
@@ -771,7 +771,7 @@ Let
 \quad \text{and} \quad
 \mathcal{E}_2 := \mathcal{E}(S_2;\fatomega_{n_y}^*).
 \end{equation}
-Then, with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s) - 2 / p$,
+Then, with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s) - 2/p$,
 \begin{enumerate}
 \item for all $\fatv \in \mathcal{E}_1$,
 \begin{equation}
@@ -1595,12 +1595,12 @@ complete the proof.
 The arguments of this section largely follows the development of a more general theorem in (Negahban et al., 2012).
 We present them mostly to keep the exposition as self-contained as possible.
 
+Assume the bounded density ratio model.
+
 \begin{lem} \label{lem:consistency1}
-Suppose the conditions of {\color{red} Section} all hold.
-Suppose the sample size satisfies
+Suppose the $\faty$-sample size satisfies
 \begin{equation}
-n_y
-\geq \max\left\{ (C_{n_y} s \log p) \log^3 ( C_{n_y} s \log p ), \frac{32 \kappa_2}{\kappa_1} s_1 \log p \right\}.
+n_y \geq \max\{ (C_{n_y} s \log p) \log^3 ( C_{n_y} s \log p ), 2 (\kappa_2 / \kappa_1) s_1 \log p \}.
 \end{equation}
 Then, the sparse KLIEP with the regularization parameter
 \begin{equation}
@@ -1608,16 +1608,13 @@ Then, the sparse KLIEP with the regularization parameter
 \end{equation}
 has an optimal solution $\check\fattheta$ satisfying
 \begin{equation}
-\|\check\fattheta - \fattheta^*\|_1 \leq K_1 \sqrt{s_1^2 \log p / n}
+\|\check\fattheta - \fattheta^*\|_1 \leq K_1 s_1 \sqrt{\log p / n}
 \end{equation}
 for some $K_1 > 0$ with probability at least
 \begin{equation}
 1 - 6\exp(-n \lambda_1^2 / C_1^2).
 \end{equation}
 \end{lem}
-
-\noindent
-$C_1 > 0$ is defined in Lemma \ref{lem:grad1} in Appendix \ref{app:grads}.
 
 \begin{proof}
 Define a function $f : \RR^p \to \RR$,
@@ -1667,13 +1664,14 @@ Thus,
 \end{equation}
 By Lemma \ref{lem:grad1},
 \begin{equation} \label{eq:applying_grad1}
-\PP\left\{ \|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \leq \lambda_1 / 2 \right\}
+\PP\{ 2\|\nabla \ell_\text{KLIEP}(\fattheta^*)\|_\infty \leq \lambda_1 \}
 \geq 1 - 6\exp(-n \lambda_1^2 / C_1^2).
 \end{equation}
-Thus,
+so that
 \begin{equation}
-0 \geq -\frac{\lambda_1}{2} \|\fatdelta\|_1 + \lambda_1 \{\|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1\}.
+0 \geq -\frac{\lambda_1}{2} \|\fatdelta\|_1 + \lambda_1 \{\|\fatdelta_{S_1^c}\|_1 - \|\fatdelta_{S_1}\|_1\}
 \end{equation}
+with probability at least $1 - 6\exp(-n \lambda_1^2 / C_1^2)$.
 Since $\lambda_1 > 0$, we must have $\check\fatdelta \in \mathcal{E}_1$.
 
 Our next step is to show that if $f(\fatdelta) > 0$ for all $\fatdelta \in \mathcal{E}_1$ with $\|\fatdelta\| = \rho$, then $\|\check\fatdelta\| \leq \rho$.
@@ -1702,61 +1700,69 @@ where
 \begin{equation}
 \bar\Hb = \int_0^1 \nabla^2 \ell_\text{KLIEP}(\fattheta^*+t\fatdelta) \, dt.
 \end{equation}
-By Proposition \ref{prop:RSC},
+By Proposition \ref{prop:rsc} and using the bound on the $\faty$-sample size,
 \begin{equation}
 \fatdelta^\top \bar\Hb \fatdelta
-\geq \kappa \|\fatdelta\|^2 - \kappa_3 \frac{\log p}{n_y} \|\fatdelta\|_1^2
-\geq \left( \kappa - 16 \kappa_3 \frac{s_1 \log p}{n_y} \right) \|\fatdelta\|^2
-\geq \frac{\kappa}{2}  \|\fatdelta\|^2,
+\geq \left( \kappa_1 - \kappa_2 \frac{s_1 \log p}{n_y} \right) \|\fatdelta\|^2
+\geq \frac{\kappa_1}{2}  \|\fatdelta\|^2
 \end{equation}
-where the last inequality uses $n_y \geq 32 (\kappa_3 / \kappa) s_1 \log p$.
+with probability at least $1 - \exp(-C_{S_{\psi(y)}} n_y / s) - 2/p$.
 Thus,
 \begin{equation}
 \begin{aligned}
 f(\fatdelta)
 &= \ell_\text{KLIEP}(\fattheta^* + \fatdelta) - \ell_\text{KLIEP}(\fattheta^*) + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
 &= \frac{1}{2} \fatdelta^\top \bar\Hb \fatdelta + \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
-&\geq \frac{\kappa}{4} \|\fatdelta\|^2 + \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\}.
+&\geq \frac{\kappa_1}{4} \|\fatdelta\|^2 + \langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\}
 \end{aligned}
 \end{equation}
+with the same probability.
 On the other hand,
-\begin{multline}
-\langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\} \\
-\geq -\frac{\lambda_1}{2} \{\|\fatdelta_{S_1^c}\| + \|\fatdelta_{S_1}\|_1\} + \lambda_1 \{\|\fatdelta_{S_1^c}\| - \|\fatdelta_{S_1}\|_1\} \\
-\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1 + \frac{1}{2} \lambda_1 \|\fatdelta_{S_1^c}\|_1
-\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1
-\geq -\frac{3}{2} \lambda_1 \sqrt{s_1	} \|\fatdelta\|.
-\end{multline}
+\begin{equation}
+\begin{aligned}
+\langle \nabla \ell_\text{KLIEP}(\fattheta^*), \fatdelta \rangle + \lambda_1 \{\|\fattheta^* + \fatdelta\|_1 - \|\fattheta^*\|_1\}
+&\geq -\frac{\lambda_1}{2} \{\|\fatdelta_{S_1^c}\| + \|\fatdelta_{S_1}\|_1\} + \lambda_1 \{\|\fatdelta_{S_1^c}\| - \|\fatdelta_{S_1}\|_1\} \\
+&\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1 + \frac{1}{2} \lambda_1 \|\fatdelta_{S_1^c}\|_1 \\
+&\geq -\frac{3}{2} \lambda_1 \|\fatdelta_{S_1}\|_1 \\
+&\geq -\frac{3}{2} \lambda_1 \sqrt{s_1} \|\fatdelta\|
+\end{aligned}
+\end{equation}
+with probability at least $1 - 6\exp(-n \lambda_1^2 / C_1^2)$.
 Therefore,
 \begin{equation}
 f(\fatdelta)
-\geq \frac{\kappa}{4} \|\fatdelta\|^2 - \frac{3}{2} \lambda_1 \sqrt{s} \|\fatdelta\|.
+\geq \frac{\kappa_1}{4} \|\fatdelta\|^2 - \frac{3}{2} \lambda_1 \sqrt{s_1} \|\fatdelta\|
 \end{equation}
-This is strictly positive when $\|\fatdelta\| > 6 \lambda_1 \sqrt{s_1} / \kappa$, and hence
+with probability at least $1 - 6\exp(-n \lambda_1^2 / C_1^2) - \exp(-C_{S_{\psi(y)}} n_y / s) - 2/p$.
+This is strictly positive for $\|\fatdelta\| > (6 / \kappa_1) \sqrt{s_1} \lambda_1$, and hence
 \begin{equation}
-\|\check\fattheta - \fattheta^*\| \leq \frac{6 C_1}{\kappa} \sqrt{\frac{s_1 \log p}{n}}.
+\|\check\fattheta - \fattheta^*\| \leq \frac{6 C_1}{\kappa_1} \sqrt{\frac{s_1 \log p}{n}}
 \end{equation}
+with the same probability
 Finally,
 \begin{equation}
 \|\check\fattheta - \fattheta^*\|_1
 \leq 4 \sqrt{s_1} \|\check\fattheta - \fattheta^*\|
-\leq \frac{24 C_1}{\kappa} \sqrt{\frac{s_1^2 \log p}{n}}.
+\leq \frac{24 C_1}{\kappa_1} s_1 \sqrt{\frac{\log p}{n}}
 \end{equation}
+with the same probability.
 \end{proof}
 
 \begin{lem} \label{lem:consistency2}
-Suppose Assumptions \ref{hyp:BSS}, \ref{hyp:IPC}, \ref{hyp:sp} and \ref{hyp:CRME} all hold.
-Assume, in addition, that
+Suppose the sample sizes satisfy
 \begin{equation}
 n \geq (K_1 / \|\fattheta^*\|)^2 s_1^2 \log p
-\quad \text{and} \quad
-n_y \geq (2 \kappa_2 / \kappa_1) s_2 \log p.
+\quad\text{and}\quad
+n_y \geq \max\{ (C_{n_y} s \log p) \log^3 ( C_{n_y} s \log p ), 2 (\kappa_2 / \kappa_1) s_1 \log p \}.
 \end{equation}
-Then, the solution to the second step optimization problem with regularization parameter $\lambda_2(n) \geq (C_\mu \vee C_\mu' s) \, \|\fatomega_{n_y}^*\|_1 \sqrt{\log p / n}$ has an optimal solution $\check\fatomega$ satisfying
+Then, the sparse Hessian inversion problem with the regularization parameter
 \begin{equation}
-\|\check\fatomega - \fatomega_{n_y}^*\|_1 = O_{\PP}\left( \sqrt{\frac{s_2^3 \log p}{n}} \right)
+\lambda_2 \geq C_2 \left( 1+C_\omega \sqrt{\log p / n_y} \right) \sqrt{\log p / n}
 \end{equation}
-for some $K_2 > 0$ with probability at least
+has an optimal solution $\check\fatomega$ satisfying
+\begin{equation}
+\|\check\fatomega - \fatomega_{n_y}^*\|_1 = O_{\PP}\left( s_1s_2^{3/2} \sqrt{\log p / n_y} \right).
+\end{equation}
 \end{lem}
 
 \begin{proof}
@@ -1766,7 +1772,7 @@ First, we show that the approximation error $\check\fatomega  - \fatomega_{n_y}^
 
 Recall that $\fatomega_{n_y}^*$ partitions into strong signals $\fatomega_{n_y,S_2}^*$ and weak signals $\fatomega_{n_y,S_2^c}^*$ with
 \begin{equation}
-\|\fatomega_{n_y,S_2^c}^*\|_1 \leq C_\omega \frac{\log p}{n_y} \|\fatomega_{n_y,S_2}^*\|_1.
+\|\fatomega_{n_y,S_2^c}^*\|_1 \leq C_\omega \sqrt{\frac{\log p}{n_y}} \|\fatomega_{n_y,S_2}^*\|_1.
 \end{equation}
 and that
 \begin{equation}
@@ -1787,13 +1793,12 @@ Since $\ell_\text{de-bias}$ is quadratic in $\fatomega$, the second-order Taylor
 \ell_\text{de-bias}(\fatomega_{n_y}^*+\fatdelta) - \ell_\text{de-bias}(\fatomega_{n_y}^*)
 = \langle \nabla \ell_\text{de-bias}(\fatomega_{n_y}^*), \fatdelta \rangle + \frac{1}{2} \fatdelta^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta) \fatdelta.
 \end{equation}
-As before, we would like to appeal to Proposition \ref{prop:RSC} to bound the quadratic term from the below.
-Looking at the conditions of Proposition \ref{prop:URSC}, we are able to do this, so long as $\check\fattheta \in \mathcal{U}(\fattheta^*)$, and by the previous lemma, this is the case with probability at least $1 - 6\exp(n \lambda_1^2 / C_1^2)$.
-\begin{equation}
-n \geq (K_1 / \|\fattheta^*\}|)^2 s_1^2 \log p.
-\end{equation}
+As before, we would like to appeal to Proposition \ref{prop:rsc} to bound the quadratic term from the below.
+Proposition \ref{prop:rsc} applies to $\fattheta \in \mathcal{U}(\fattheta^*)$.
+By Lemma \ref{lem:consistency1}, it suffices to assume $n \geq (K_1 / \|\fattheta^*\}|)^2 s_1^2 \log p$ to conclude that
+$\check\fattheta \in \mathcal{U}(\fattheta^*)$ with probability at least $1 - 6\exp(-n \lambda_1^2 / C_1^2) - \exp(-C_{S_{\psi(y)}} n_y / s) - 2/p$.
 
-With only an approximately sparsity assumption $\fatomega_{n_y}^*$, the second bound in the conclusion of Proposition \ref{prop:RSC} applies, which is
+With only an approximately sparsity assumption $\fatomega_{n_y}^*$, the second bound of the proposition applies, and this is
 \begin{multline}
 \fatdelta^\top \nabla^2 \ell_\text{KLIEP}(\check\fattheta) \fatv
 \geq \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \|\fatdelta\|^2 \\
@@ -1816,82 +1821,79 @@ f(\fatdelta)
 - \frac{1}{2} \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3\lambda_2 \sqrt{s_2} \right) \|\fatdelta\| \\
 - \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 - \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}}.
 \end{multline}
-Provided $n_y \geq 2 (\kappa_2 / \kappa_1) s_2 \log p$,
+Since $n_y \geq 2 (\kappa_2 / \kappa_1) s_2 \log p$,
 \begin{equation}
-\frac{1}{2} \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \geq \frac{\kappa_1}{4} := a
+\frac{1}{2} \left( \kappa_1 - \kappa_2 \frac{s_2 \log p}{n_y} \right) \geq \frac{\kappa_1}{4} := a > 0.
 \end{equation}
-is positive.
-Plugging in $\lambda_2 = C_2 s_1 \sqrt{s_2 \log p / n} + C_\omega C_2 s_1 \sqrt{s_2} \log p / \sqrt{n n_y}$,
-\begin{multline}
-\tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3\lambda_2 \sqrt{s_2} \\
-= \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3C_2 s_1 s_2 \sqrt{\frac{\log p}{n}} + 3 C_\omega C_2 s_1 s_2 \frac{\log p}{n}
-\end{multline}
+Plugging in $\lambda_2 = C_2 ( 1+C_\omega \sqrt{\log p / n_y} ) s_1 \sqrt{s_2 \log p / n}$,
+\begin{equation}
+\begin{aligned}
+& \frac{1}{2} \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3\lambda_2 \sqrt{s_2} \right) \\
+= & \frac{1}{2} \left( \tau_1 \sqrt{\frac{\log p}{n_y}} + \tau_2 s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3 s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3 C_2 \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) s_1 s_2 \sqrt{\frac{\log p}{n}} \right) \\
+\leq & \frac{1}{2} \left( \tau_1 \sqrt{\frac{\log p}{n}} + \tau_2 s_2 \sqrt{\frac{\log p}{n}} + \tau_3 s_2 \left( \frac{\log p}{n} \right)^{3/2} + 3 C_2 s_1 s_2 \sqrt{\frac{\log p}{n}} + 3 C_2 C_\omega s_1 s_2 \frac{\log p}{n} \right) \\
+= & \frac{1}{2} \left( \tau_1 \frac{1}{s_1s_2} + \tau_2 \frac{1}{s_1} + \tau_3 \frac{\log p}{s_1 n} + 3 C_2 + 3 C_2 C_\omega \sqrt{\frac{\log p}{n}} \right) s_1 s_2 \sqrt{\frac{\log p}{n}} \\
+= & : b \cdot s_1 s_2 \sqrt{\frac{\log p}{n}}.
+\end{aligned}
+\end{equation}
 and
-\begin{multline}
-\frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}} \\
-= \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_\omega C_2}{\lambda_{\min}} s_1 s_2 \frac{\log p}{\sqrt{n n_y}} + \frac{2C_\omega^2 C_2}{\lambda_{\min}} s_1 s_2 \frac{\log p}{\sqrt{n n_y}}.
-\end{multline}
-
-\begin{multline}
-\frac{1}{2} \left( \tau_1 \delta_{n_y} + \tau_2 \delta_{n_y} s_2 + \tau_3 \frac{\delta_{n_y} s_2 \log p}{n_y} + 3\lambda_2 \sqrt{s_2} \right) \\
-= \frac{1}{2} \left( \tau_1' \sqrt{\frac{\log p}{n_y}} + \tau_2' s_2 \sqrt{\frac{\log p}{n_y}} + \tau_3' s_2 \left( \frac{\log p}{n_y} \right)^{3/2} + 3 \, C_2 \frac{s_1 s_2 \log p}{\sqrt{n n_y}} + 3 \, C_2 \frac{s_1 s_2 \log p}{\sqrt{n n_y}} \right) \\
-= \frac{1}{2} \left( \tau_1' \frac{1}{s_2} + \tau_2' + \tau_3' \frac{\log p}{n_y} + 3 \, C_2 s_1 \sqrt{\frac{\log p}{n}} + 3 \, C_2 s_1 \sqrt{\frac{\log p}{n}} \right) s \sqrt{\frac{\log p}{n_y}}
-:= b \cdot s \sqrt{\frac{\log p}{n}}
-\end{multline}
-and
-\begin{multline}
-\frac{\tau_4}{2} \frac{\delta_{n_y}^2 s_2 \log p}{n_y} + 2\lambda_{\min}^{-1} \lambda_2 \delta_{n_y} \sqrt{s_2} \\
-\leq \left( \frac{\tau_4}{2} \frac{\log p}{s_1 n_y} + \frac{2 \, C_2}{\lambda_{\min}} \sqrt{\frac{\log p}{n_y}} + \frac{2 \, C_2}{\lambda_{\min}} \right) \frac{s^2 \log p}{n}
-=: c \cdot \frac{s^2 \log p}{n}.
-\end{multline}
+\begin{equation}
+\begin{aligned}
+& \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_\omega}{\lambda_{\min}} \lambda_2 \sqrt{\frac{s_2 \log p}{n_y}} \\
+= & \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n_y} \right)^2 + \frac{2C_2 C_\omega}{\lambda_{\min}} \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) s_1 s_2 \frac{\log p}{\sqrt{nn_y}} \\
+\leq & \frac{\tau_4}{2} s_2 \left( \frac{\log p}{n} \right)^2 + \frac{2C_2 C_\omega}{\lambda_{\min}} s_1 s_2 \frac{\log p}{n} + \frac{2C_2 C_\omega^2}{\lambda_{\min}} s_1 s_2 \left( \frac{\log p}{n} \right)^{3/2} \\
+= & \left( \frac{\tau_4}{2} \frac{\log p}{s_1^2 s_2 n} + \frac{2C_2 C_\omega}{\lambda_{\min}} \frac{1}{s_1 s_2} + \frac{2C_2 C_\omega^2}{\lambda_{\min}} \frac{1}{s_1s_2} \sqrt{\frac{\log p}{n}} \right) s_1^2 s_2^2 \frac{\log p}{n} \\
+= & : c \cdot s_1^2 s_2^2 \frac{\log p}{n}.
+\end{aligned}
+\end{equation}
 From (\ref{eq:f(delta)}), we have arrived at
 \begin{equation}
-f(\fatdelta) \geq a\|\fatdelta\|^2 - b \cdot s \sqrt{\frac{\log p}{n}} \|\fatdelta\| - c \cdot \frac{s^2 \log p}{n}.
+f(\fatdelta) \geq a\|\fatdelta\|^2 - b \cdot s_1 s_2 \sqrt{\frac{\log p}{n}} \|\fatdelta\| - c \cdot s_1^2 s_2^2 \frac{\log p}{n}.
 \end{equation}
+This is a quadratic in $\|\fatdelta\|$.
 Since $a > 0$, this is positive for
 \begin{equation}
-\|\fatdelta\| \geq \frac{b + \sqrt{b^2 + 4ac}}{2a} \sqrt{\frac{s^2 \log p}{n}}.
+\|\fatdelta\| \geq \frac{b + \sqrt{b^2 + 4ac}}{2a} s_1 s_2 \sqrt{\frac{\log p}{n}}.
 \end{equation}
-This implies
+As before, this implies that
 \begin{equation}
-\|\check\fatomega - \fatomega_{n_y}^*\| \leq \frac{b + \sqrt{b^2 + 4ac}}{2a} \sqrt{\frac{s^2 \log p}{n}}.
+\|\check\fatomega - \fatomega_{n_y}^*\| \leq \frac{b + \sqrt{b^2 + 4ac}}{2a} s_1 s_2 \sqrt{\frac{\log p}{n}}.
 \end{equation}
 Finally,
 \begin{equation}
 \begin{aligned}
-\|\hat\fatomega - \fatomega_{n_y}^*\|_1
+\|\check\fatomega - \fatomega_{n_y}^*\|_1
 &\leq 4\sqrt{s_2} \|\check\fatomega - \fatomega_{n_y}^*\|_2 + 4\|\fatomega_{n_y,S_2^c}\|_1 \\
-&\leq \frac{2b + 2\sqrt{b^2 + 4ac}}{a} \sqrt{\frac{s_2 s^2 \log p}{n}} + \frac{4 C_\omega}{\lambda_{\min}} \sqrt{\frac{s_2 \log p}{n_y}} \\
-&\leq \left( \frac{2b + 2\sqrt{b^2 + 4ac}}{a} + \frac{4 C_\omega}{\lambda_{\min}} \frac{1}{s} \right) \sqrt{\frac{s_2 s^2  \log p}{n_y}}.
+&\leq \frac{2b + 2\sqrt{b^2 + 4ac}}{a} s_1 s_2^{3/2} \sqrt{\frac{\log p}{n}} + \frac{4 C_\omega}{\lambda_{\min}} \sqrt{\frac{s_2 \log p}{n_y}} \\
+&\leq \left( \frac{2b + 2\sqrt{b^2 + 4ac}}{a} + \frac{4 C_\omega}{\lambda_{\min}} \frac{1}{s_1 s_2} \right) s_1s_2^{3/2} \sqrt{\frac{\log p}{n_y}}.
 \end{aligned}
 \end{equation}
-Since $b$ and $c$ tend to a constant, and $s$ tend to infinity, the conclusion follows.
+Since $b$ and $c$ tend to constants, $s_1$ and $s_2$ tend to infinity, and the conclusion follows.
 \end{proof}
 
 \begin{lem} \label{lem:star_shaped}
-For any $\fatw^* \in \RR^p$ and $S \subseteq [p]$, $\mathcal{E}(S;\fatw^*)$ is star-shaped, i.e.~if $\fatdelta \in \mathcal{E}(S;\fatw^*)$, then $t\fatdelta \in \mathcal{E}(S;\fatw^*)$ for all $t \in [0,1]$.
+For any $\fatv^* \in \RR^p$ and any $S \subseteq [p]$, $\mathcal{E}(S;\fatv^*)$ is star-shaped, i.e.~if $\fatdelta \in \mathcal{E}(S;\fatv^*)$, then $t\fatdelta \in \mathcal{E}(S;\fatv^*)$ for all $t \in [0,1]$.
 \end{lem}
 
 \begin{proof}
-Let $\fatdelta \in \mathcal{E}(S:\fatw^*)$.
+Suppose $\fatdelta \in \mathcal{E}(S:\fatv^*)$.
 \begin{equation}
 \|(t\fatdelta)_{S^c}\|_1
 = t \|\fatdelta_{S^c}\|_1
-\leq 3t \|\fatdelta_S\|_1 + 4t \|\fatw_{S^c}^*\|_1
-= 3 \|(t\fatdelta)_S\|_1 + 4t \|\fatw_{S^c}^*\|_1.
+\leq 3t \|\fatdelta_S\|_1 + 4t \|\fatv_{S^c}^*\|_1
+= 3 \|(t\fatdelta)_S\|_1 + 4t \|\fatv_{S^c}^*\|_1.
 \end{equation}
 When $t \in (0,1)$, then
 \begin{equation}
-\|(t\fatdelta)_{S^c}\|_1 \leq 3 \|(t\fatdelta)_S\|_1 + 4\|\fatw_{S^c}^*\|_1,
+\|(t\fatdelta)_{S^c}\|_1 \leq 3 \|(t\fatdelta)_S\|_1 + 4\|\fatv_{S^c}^*\|_1,
 \end{equation}
-and $t\fatdelta \in \mathcal{E}(S;\fatw^*)$ also.
+and $t\fatdelta \in \mathcal{E}(S;\fatv^*)$ also.
 \end{proof}
 
 \section{Asymptotics} \label{app:asymp}
 
 Lemma \ref{lem:Berry_Esseen_CLT} is meaningful when
 \begin{equation}
-(1+\delta_{n_y})^2 s_2 = o(n^\alpha)
+\left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right)^2 s_2 = o(n^\alpha)
 \quad\text{and}\quad
 n_y^{-1 / (1+2\alpha)} = O(n^{-1})
 \quad\text{for some}\quad
@@ -2220,11 +2222,11 @@ then
 \end{lem}
 
 \begin{proof}
-Put $C_2 = \max\{ 2C_{\nabla^2 \ell} K_1, 4 C_\nu\}$.
+Put $C_2 = \max\{2K_1 C_{\nabla^2 \ell},4 C_\nu\}$.
 $n \leq n_y$, and as we may assume $s_1 \geq 1$, (\ref{eq:lambda2}) implies
 \begin{equation}
 \lambda_2
-\geq \max\left\{2C_{\nabla^2 \ell} K_1,4C_\nu\sqrt{\frac{n}{s_1^2 n_y}} \right\} \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_1^2 s_2 \log p}{n}}.
+\geq \max\left\{2K_1 C_{\nabla^2 \ell} \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_1^2 s_2 \log p}{n}},4C_\nu \left( 1+C_\omega \sqrt{\frac{\log p}{n_y}} \right) \sqrt{\frac{s_2 \log p}{n_y}} \right\} .
 \end{equation}
 Applying Lemma \ref{lem:perturbation_bound} with Lemma \ref{lem:consistency1},
 \begin{equation}
