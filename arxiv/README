@@ -1,0 +1,5 @@
+The goal of this program is to allow for simple uploading to arxiv.
+
+1) Put paper.pdf into the current folder (this is the file you want to upload)
+2) Run make
+3) Upload arxivPaper.tex, paper.pdf and pax.sty to arxiv
