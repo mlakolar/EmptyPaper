@@ -9060,8 +9060,7 @@
   month     = {20--22 Jun},
   publisher = {PMLR},
   abstract  = {We derive a new discrepancy statistic for measuring differences between two probability distributions based on combining Stein’s identity and the reproducing kernel Hilbert space theory. We apply our result to test how well a probabilistic model fits a set of observations, and derive a new class of powerful goodness-of-fit tests that are widely applicable for complex and high dimensional distributions, even for those with computationally intractable normalization constants. Both theoretical and empirical properties of our methods are studied thoroughly.},
-  file      = {:Liu2016Kernelized.pdf:PDF},
-  pdf       = {http://proceedings.mlr.press/v48/liub16.pdf},
+  file      = {:Liu2016Kernelized.pdf:PDF;liub16.pdf:http\://proceedings.mlr.press/v48/liub16.pdf:PDF},
   url       = {http://proceedings.mlr.press/v48/liub16.html},
 }
 
@@ -19796,8 +19795,7 @@
   month     = {20--22 Jun},
   publisher = {PMLR},
   abstract  = {We propose a nonparametric statistical test for goodness-of-fit: given a set of samples, the test determines how likely it is that these were generated from a target density function. The measure of goodness-of-fit is a divergence constructed via Stein’s method using functions from a Reproducing Kernel Hilbert Space. Our test statistic is based on an empirical estimate of this divergence, taking the form of a V-statistic in terms of the log gradients of the target density and the kernel. We derive a statistical test, both for i.i.d. and non-i.i.d. samples, where we estimate the null distribution quantiles using a wild bootstrap procedure. We apply our test to quantifying convergence of approximate Markov Chain Monte Carlo methods, statistical model criticism, and evaluating quality of fit vs model complexity in nonparametric density estimation.},
-  file      = {:Chwialkowski2016Kernel.pdf:PDF},
-  pdf       = {http://proceedings.mlr.press/v48/chwialkowski16.pdf},
+  file      = {:Chwialkowski2016Kernel.pdf:PDF;chwialkowski16.pdf:http\://proceedings.mlr.press/v48/chwialkowski16.pdf:PDF},
   url       = {http://proceedings.mlr.press/v48/chwialkowski16.html},
 }
 
@@ -19982,7 +19980,7 @@
   month     = {09--11 May},
   publisher = {PMLR},
   abstract  = {We consider the problem of learning mixtures of generalized linear models (GLM) which arise in   classification and regression problems.   Typical learning  approaches such as expectation maximization (EM) or variational Bayes  can get stuck in spurious local optima. In contrast,  we present a tensor decomposition method which is guaranteed to correctly recover the parameters. The key insight is to employ certain feature transformations of the input, which depend on the input generative model. Specifically, we employ score function tensors of the input  and compute their cross-correlation with the response variable.   We establish that the decomposition of this tensor consistently recovers the parameters, under mild non-degeneracy conditions.  We demonstrate that the computational and  sample complexity of our method is a low order polynomial of the input and the latent  dimensions.},
-  pdf       = {http://proceedings.mlr.press/v51/sedghi16.pdf},
+  file      = {sedghi16.pdf:http\://proceedings.mlr.press/v51/sedghi16.pdf:PDF},
   url       = {http://proceedings.mlr.press/v51/sedghi16.html},
 }
 
@@ -20025,7 +20023,7 @@
   month     = {06--11 Aug},
   publisher = {PMLR},
   abstract  = {We consider estimating the parametric component of single index models in high dimensions. Compared with existing work, we do not require the covariate to be normally distributed. Utilizing Stein’s Lemma, we propose estimators based on the score function of the covariate. Moreover, to handle score function and response variables that are heavy-tailed, our estimators are constructed via carefully thresholding their empirical counterparts. Under a bounded fourth moment condition, we establish optimal statistical rates of convergence for the proposed estimators. Extensive numerical experiments are provided to back up our theory.},
-  pdf       = {http://proceedings.mlr.press/v70/yang17a/yang17a.pdf},
+  file      = {yang17a.pdf:http\://proceedings.mlr.press/v70/yang17a/yang17a.pdf:PDF},
   url       = {http://proceedings.mlr.press/v70/yang17a.html},
 }
 
@@ -20074,6 +20072,105 @@
   mrnumber   = {2281245},
   mrreviewer = {P. Laurie Davies},
   url        = {https://doi.org/10.1198/016214505000001285},
+}
+
+@InProceedings{Belkin2018Understand,
+  author    = {Belkin, Mikhail and Ma, Siyuan and Mandal, Soumik},
+  title     = {To Understand Deep Learning We Need to Understand Kernel Learning},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning},
+  year      = {2018},
+  editor    = {Dy, Jennifer and Krause, Andreas},
+  volume    = {80},
+  series    = {Proceedings of Machine Learning Research},
+  pages     = {541--549},
+  address   = {Stockholmsmässan, Stockholm Sweden},
+  month     = {10--15 Jul},
+  publisher = {PMLR},
+  abstract  = {Generalization performance of classifiers in deep learning has recently become a subject of intense study. Deep models, which are typically heavily over-parametrized, tend to fit the training data exactly. Despite this “overfitting", they perform well on test data, a phenomenon not yet fully understood. The first point of our paper is that strong performance of overfitted classifiers is not a unique feature of deep learning. Using six real-world and two synthetic datasets, we establish experimentally that kernel machines trained to have zero classification error or near zero regression error (interpolation) perform very well on test data. We proceed to give a lower bound on the norm of zero loss solutions for smooth kernels, showing that they increase nearly exponentially with data size. None of the existing bounds produce non-trivial results for interpolating solutions. We also show experimentally that (non-smooth) Laplacian kernels easily fit random labels, a finding that parallels results recently reported for ReLU neural networks. In contrast, fitting noisy data requires many more epochs for smooth Gaussian kernels. Similar performance of overfitted Laplacian and Gaussian classifiers on test, suggests that generalization is tied to the properties of the kernel function rather than the optimization process. Some key phenomena of deep learning are manifested similarly in kernel methods in the modern “overfitted" regime. The combination of the experimental and theoretical results presented in this paper indicates a need for new theoretical ideas for understanding properties of classical kernel methods. We argue that progress on understanding deep learning will be difficult until more tractable “shallow” kernel methods are better understood.},
+  file      = {:Belkin2018Understand.pdf:PDF;belkin18a.pdf:http\://proceedings.mlr.press/v80/belkin18a/belkin18a.pdf:PDF},
+  timestamp = {2018.10.18},
+  url       = {http://proceedings.mlr.press/v80/belkin18a.html},
+}
+
+@Article{Belkin2018Overfitting,
+  author      = {Mikhail Belkin and Daniel Hsu and Partha Mitra},
+  title       = {Overfitting or perfect fitting? Risk bounds for classification and regression rules that interpolate},
+  journal     = {ArXiv e-prints: 1806.05161},
+  year        = {2018},
+  abstract    = {Many modern machine learning models are trained to achieve zero or near-zero training error in order to obtain near-optimal (but non-zero) test error. This phenomenon of strong generalization performance for "overfitted" / interpolated classifiers appears to be ubiquitous in high-dimensional data, having been observed in deep networks, kernel machines, boosting and random forests. Their performance is robust even when the data contain large amounts of label noise. Very little theory is available to explain these observations. The vast majority of theoretical analyses of generalization allows for interpolation only when there is little or no label noise. This paper takes a step toward a theoretical foundation for interpolated classifiers by analyzing local interpolating schemes, including geometric simplicial interpolation algorithm and weighted $k$-nearest neighbor schemes. Consistency or near-consistency is proved for these schemes in classification and regression problems. These schemes have an inductive bias that benefits from higher dimension, a kind of "blessing of dimensionality". Finally, connections to kernel machines, random forests, and adversarial examples in the interpolated regime are discussed.},
+  date        = {2018-06-13},
+  eprint      = {http://arxiv.org/abs/1806.05161v2},
+  eprintclass = {stat.ML},
+  eprinttype  = {arXiv},
+  file        = {:Belkin2018Overfitting.pdf:PDF},
+  keywords    = {stat.ML, cond-mat.stat-mech, cs.LG},
+}
+
+@Article{Belkin2018Does,
+  author      = {Mikhail Belkin and Alexander Rakhlin and Alexandre B. Tsybakov},
+  title       = {Does data interpolation contradict statistical optimality?},
+  journal     = {ArXiv e-prints: 1806.09471},
+  year        = {2018},
+  abstract    = {We show that learning methods interpolating the training data can achieve optimal rates for the problems of nonparametric regression and prediction with square loss.},
+  date        = {2018-06-25},
+  eprint      = {http://arxiv.org/abs/1806.09471v1},
+  eprintclass = {stat.ML},
+  eprinttype  = {arXiv},
+  file        = {:Belkin2018Does.pdf:PDF},
+  keywords    = {stat.ML, cs.LG, math.ST, stat.TH},
+}
+
+@Article{Radchenko2015High,
+  author    = {Radchenko, Peter},
+  title     = {High dimensional single index models},
+  journal   = {J. Multivariate Anal.},
+  year      = {2015},
+  volume    = {139},
+  pages     = {266--282},
+  issn      = {0047-259X},
+  doi       = {10.1016/j.jmva.2015.02.007},
+  file      = {:Radchenko2015High.pdf:PDF},
+  fjournal  = {Journal of Multivariate Analysis},
+  mrclass   = {62J02 (62F12 62J07 62P25)},
+  mrnumber  = {3349492},
+  timestamp = {2018.10.18},
+  url       = {https://doi.org/10.1016/j.jmva.2015.02.007},
+}
+
+@Article{Lian2015Variance,
+  author    = {Lian, Heng and Liang, Hua and Carroll, Raymond J.},
+  title     = {Variance function partially linear single-index models},
+  journal   = {J. R. Stat. Soc. Ser. B. Stat. Methodol.},
+  year      = {2015},
+  volume    = {77},
+  number    = {1},
+  pages     = {171--194},
+  issn      = {1369-7412},
+  doi       = {10.1111/rssb.12066},
+  file      = {:Lian2015Variance.pdf:PDF},
+  fjournal  = {Journal of the Royal Statistical Society. Series B. Statistical Methodology},
+  mrclass   = {62J02 (62G08 62G20 62P12)},
+  mrnumber  = {3299404},
+  timestamp = {2018.10.18},
+  url       = {https://doi.org/10.1111/rssb.12066},
+}
+
+@Article{Fang2015Variance,
+  author    = {Fang, Yixin and Lian, Heng and Liang, Hua and Ruppert, David},
+  title     = {Variance function additive partial linear models},
+  journal   = {Electron. J. Stat.},
+  year      = {2015},
+  volume    = {9},
+  number    = {2},
+  pages     = {2793--2827},
+  issn      = {1935-7524},
+  doi       = {10.1214/15-EJS1080},
+  file      = {:Fang2015Variance.pdf:PDF},
+  fjournal  = {Electronic Journal of Statistics},
+  mrclass   = {62G08 (62F12 62G20 62J02)},
+  mrnumber  = {3439185},
+  timestamp = {2018.10.18},
+  url       = {https://doi.org/10.1214/15-EJS1080},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
