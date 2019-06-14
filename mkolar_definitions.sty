@@ -1,17 +1,17 @@
 
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
-\ifx\proof\undefined 
+\ifx\proof\undefined
 \RequirePackage{amsthm}
 \fi
-\RequirePackage{bm} 
+\RequirePackage{bm}
 \RequirePackage{url}
 
 
 \let\hat\widehat
 \let\tilde\widetilde
 
-% bold alphabet 
+% bold alphabet
 
 \newcommand{\ab}{\mathbf{a}}
 \newcommand{\bb}{\mathbf{b}}
@@ -134,8 +134,8 @@
 \DeclareMathOperator*{\Cor}{Corr}
 \DeclareMathOperator*{\Cov}{Cov}
 \DeclareMathOperator*{\ind}{1{\hskip -2.5 pt}\hbox{$\rm{I}$}}  % Indicator
-\newcommand{\smallfrac}[2]{{\textstyle \frac{#1}{#2}}}  
-                                                        
+\newcommand{\smallfrac}[2]{{\textstyle \frac{#1}{#2}}}
+
 \newcommand*{\zero}{{\bf 0}}
 \newcommand*{\one}{{\bf 1}}
 
@@ -175,8 +175,8 @@
 
 %%%%% Norms
 
-\newcommand{\norm}[1]{||#1||}
-\newcommand{\bignorm}[1]{\bigg|\bigg|#1\bigg|\bigg|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\bignorm}[1]{\bigg\|#1\bigg\|}
 \newcommand{\opnorm}[2]{| \! | \! | #1 | \! | \! |_{{#2}}}
 
 %%%%% Dot product
